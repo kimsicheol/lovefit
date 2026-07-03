@@ -338,14 +338,83 @@ function coupleReport(tA, tB) {
   const golden = isGolden(tA, tB);
   let total = cats.reduce((s, c) => s + c.score, 0) + 3 + (golden ? 6 : 0);
   total = Math.max(50, Math.min(99, total));
-  // 조언
+  // ----- 처방전: 축마다(같아도, 달라도) 상세 처방 + 실천 미션 -----
   const tips = [];
-  if (axisRel(A, B, "TF") === "diff") tips.push("싸움의 90%는 여기서 납니다: F가 서운함을 말할 때 T는 해결책보다 \u201C많이 서운했겠다\u201D를 먼저. T가 피드백할 땐 F는 \u2018공격이 아니라 관심\u2019으로 받기.");
-  if (axisRel(A, B, "SN") === "diff") tips.push("S는 N의 \u2018뜬구름\u2019에 한 번 올라타 주고, N은 S의 \u2018현실 체크\u2019를 브레이크가 아닌 안전벨트로 여겨주세요.");
-  if (axisRel(A, B, "JP") === "diff") tips.push("여행·기념일은 J가 뼈대를 잡고 P가 살을 붙이는 분업이 정답. 계획의 30%는 비워두기로 미리 합의하세요.");
-  if (axisRel(A, B, "EI") === "diff") tips.push("E의 모임 데이와 I의 홈 데이를 번갈아 배치하면 둘 다 충전됩니다. \u2018같이 있지만 각자 노는 시간\u2019도 훌륭한 데이트.");
-  if (tips.length === 0) tips.push("네 축이 모두 같은 희귀 조합. 편안함이 최대 무기지만, 둘 다 같은 걸 놓치는 사각지대가 생깁니다. 가끔은 일부러 서로의 반대 역할을 맡아보세요.");
-  tips.push("검사 결과는 대화의 출발점이지 판정이 아닙니다. 점수보다 각 항목의 설명을 함께 읽는 시간이 진짜 궁합을 만듭니다.");
+  // T/F — 갈등 해결
+  if (axisRel(A, B, "TF") === "diff") {
+    tips.push({ tag: "갈등 해결", title: "이성(T) × 감성(F) — 싸움의 진원지이자, 최고의 균형추",
+      body: "F가 힘든 이야기를 꺼낼 때 T는 3초 만에 해결책이 떠오르지만, 그 순간 F에게 필요한 건 정답이 아니라 \u2018내 편\u2019이라는 확인입니다. 반대로 T가 담백하게 사실을 짚을 때 F는 그것을 공격으로 번역하기 쉽습니다. 대화 시작 전에 \u201C이건 공감용이야\u201D / \u201C이건 해결용이야\u201D 라고 채널을 먼저 선언하는 것만으로 다툼의 절반이 사라집니다. T의 조언은 공감 두 문장 뒤에 붙일 때 비로소 선물이 됩니다.",
+      action: "이번 주 한 번, 서로의 방식으로 반응해보기 — T는 해결책 없이 끝까지 듣기만, F는 감정을 빼고 요점 세 줄로 말해보기." });
+  } else if (A.TF === "T") {
+    tips.push({ tag: "갈등 해결", title: "둘 다 이성파(T) — 효율적인 화해, 건조해질 위험",
+      body: "갈등이 짧고 감정 소모가 적다는 건 커플계의 엄청난 재능입니다. 다만 \u2018맞는 말\u2019만 오가다 보면 어느 순간 대화가 업무 회의처럼 느껴질 수 있습니다. 사실 정리가 끝난 뒤 \u201C그래도 서운했지?\u201D 한 문장을 의식적으로 추가하세요. 표현이 어색하면 계획으로 풀면 됩니다 — 기념일과 애정 표현도 프로젝트처럼 설계하면 T커플은 누구보다 잘합니다.",
+      action: "논쟁이 끝난 날엔 승패 정리 대신 \u201C오늘 대화에서 고마웠던 점 하나\u201D를 서로 말하고 마무리하기." });
+  } else {
+    tips.push({ tag: "갈등 해결", title: "둘 다 감성파(F) — 다정한 화해, 침묵의 골 주의",
+      body: "서로의 표정만 봐도 기분을 읽는 커플이라 화해가 부드럽습니다. 문제는 그 다정함의 그림자 — 상대가 상처받을까 봐 진짜 불만을 삼키는 습관이 생기기 쉽다는 것. 삼킨 서운함은 사라지지 않고 이자가 붙어, 어느 날 아주 사소한 일로 한꺼번에 터집니다. \u2018불편한 말을 해도 안전한 자리\u2019를 정기적으로 만들어 잔고를 그때그때 정산하세요.",
+      action: "한 달에 한 번 \u2018솔직 데이\u2019 — 서운했던 것 하나씩만 꺼내고, 듣는 쪽은 변명 없이 10분간 듣기만 하기." });
+  }
+  // S/N — 대화·세계관
+  if (axisRel(A, B, "SN") === "diff") {
+    tips.push({ tag: "대화 케미", title: "현실(S) × 상상(N) — 대화 채널을 맞추는 법",
+      body: "S는 \u2018오늘 뭐 먹지\u2019를 말하는데 N은 \u201810년 뒤 우리\u2019를 말하는, 주파수가 다른 라디오 같은 조합입니다. 서로 지루하거나 뜬구름처럼 느껴지는 순간이 반드시 옵니다. N의 상상에 S가 \u201C그거 하려면 뭐부터 하면 돼?\u201D로 다리를 놓아주고, S의 현실 이야기에 N이 \u201C그게 이뤄지면 어떤 기분일까?\u201D로 색을 입혀주면, 두 채널이 하나의 이야기로 합쳐집니다.",
+      action: "데이트 대화 주제를 번갈아 정하기 — 한 번은 S의 \u2018지금 여기\u2019 주제, 한 번은 N의 \u2018만약에\u2019 주제." });
+  } else if (A.SN === "S") {
+    tips.push({ tag: "대화 케미", title: "둘 다 현실파(S) — 실행력 만렙, 낭만 보급 필요",
+      body: "계획하면 실행되고, 말한 것은 지켜지는 커플. 살림과 인생 운영에서는 최강 조합입니다. 다만 대화가 일정·지출·현안에만 머물면 관계의 온도가 서서히 내려갑니다. 낭만은 S커플에게 저절로 생기지 않으니, \u2018쓸모없는 것\u2019을 일부러 예산에 편성하세요 — 목적 없는 드라이브, 이유 없는 꽃 한 다발, 계획에 없던 야식.",
+      action: "이번 달 안에 실용성 0점짜리 데이트 하나 실행하기. 조건은 단 하나, \u2018남는 게 없어야 함\u2019." });
+  } else {
+    tips.push({ tag: "대화 케미", title: "둘 다 상상파(N) — 새벽 대화의 천재들, 현실 담당 공석",
+      body: "\u201C만약에\u201D 하나로 새벽 세 시까지 갈 수 있는 커플. 대화가 마르지 않는 건 관계의 가장 큰 자산입니다. 대신 둘 다 예약, 서류, 잔금 처리 같은 현실 디테일을 \u2018나중에\u2019로 미루는 경향이 겹칩니다. 한 명에게 현실 담당을 떠넘기면 반드시 서운함이 생기니, 역할 분담 대신 \u2018같이 처리하는 시간\u2019을 고정하세요.",
+      action: "일요일 저녁 15분 \u2018현실 회의\u2019 — 다음 주 예약·지출·일정만 빠르게 점검하고 끝내기." });
+  }
+  // E/I — 에너지
+  if (axisRel(A, B, "EI") === "diff") {
+    tips.push({ tag: "에너지 밸런스", title: "외향(E) × 내향(I) — 충전기가 다른 두 사람",
+      body: "E는 사람을 만나며 충전되고 I는 혼자 있으며 충전됩니다. 여기서 두 가지 오해가 태어납니다 — E는 I의 혼자 시간을 \u2018나를 밀어내는 것\u2019으로, I는 E의 모임 사랑을 \u2018나로는 부족한 것\u2019으로 읽는 것. 둘 다 틀렸습니다. \u2018혼자 시간 ≠ 사랑 부족\u2019이라는 문장을 둘의 공식 합의로 만들어두고, 모임은 미리 예고하되 I에게는 언제든 먼저 빠질 수 있는 퇴장권을 주세요.",
+      action: "주말 하루를 반으로 나누기 — 오전은 E의 바깥 일정, 오후는 I의 홈 타임. 혹은 \u2018같이 있지만 각자 노는 2시간\u2019 도입." });
+  } else if (A.EI === "E") {
+    tips.push({ tag: "에너지 밸런스", title: "둘 다 외향파(E) — 마르지 않는 일정, 깊이는 따로 챙기기",
+      body: "모임, 여행, 이벤트가 끊이지 않는 에너지 넘치는 커플입니다. 함정은 단 하나 — 항상 사람들 속에 있다 보니 정작 둘만의 깊은 대화가 뒤로 밀린다는 것. 관계의 깊이는 시끌벅적함이 아니라 조용한 밤의 대화에서 자랍니다.",
+      action: "격주 한 번 \u2018폰 없는 둘만의 저녁\u2019 — 외부 약속 금지, 배달과 대화만 허용." });
+  } else {
+    tips.push({ tag: "에너지 밸런스", title: "둘 다 내향파(I) — 집이 최고의 데이트, 세계가 좁아질 위험",
+      body: "집이 가장 완벽한 데이트 장소인 아늑한 커플. 서로의 혼자 시간을 침범하지 않는 것만으로 신뢰가 쌓이는, 유지비가 가장 적게 드는 조합입니다. 다만 편안함에 안주하면 둘의 세계가 반경 1km로 좁아집니다. 새로운 자극이 없으면 대화 소재도 함께 마릅니다.",
+      action: "분기에 한 번, 둘 다 처음인 동네나 경험에 함께 도전하기. 끝나고 집에서 복기하는 것까지가 데이트." });
+  }
+  // J/P — 라이프스타일
+  if (axisRel(A, B, "JP") === "diff") {
+    tips.push({ tag: "라이프스타일", title: "계획(J) × 즉흥(P) — 최강의 여행 콤비 혹은 잔소리 루프",
+      body: "J의 계획을 P는 \u2018구속\u2019으로, P의 즉흥을 J는 \u2018무책임\u2019으로 번역하는 순간 루프가 시작됩니다. 정답은 분업 — J가 뼈대(예약·마감·동선)를 잡고, P가 살(현장의 변주와 발견)을 붙이는 겁니다. 계획의 30%는 공식적으로 비워두기로 미리 합의하고, J는 계획 변경을 실패가 아닌 \u2018옵션 발동\u2019으로 부르는 연습을 해보세요.",
+      action: "다음 여행에서 하루는 J의 풀플랜 데이, 하루는 P의 노플랜 데이로 운영해보고 저녁에 소감 나누기." });
+  } else if (A.JP === "J") {
+    tips.push({ tag: "라이프스타일", title: "둘 다 계획파(J) — 인생 설계 최적 콤비, 계획 충돌만 관리",
+      body: "여행 엑셀이 두 개 만들어지는 커플 — 이건 축복이자 화근입니다. 각자의 계획이 어긋날 때 다툼의 주제가 \u2018누구 계획이 더 맞나\u2019가 되기 쉽거든요. 계획을 하나의 공동 캘린더로 통합하고, 서로의 일정에 수정 권한을 부여하세요. 그리고 J커플의 진짜 약점은 예상 밖 상황입니다. 둘 다 동시에 스트레스를 받으니, \u2018망한 날 프로토콜\u2019(웃고 → B안 발동 → 나중에 추억으로 승격)을 평화로울 때 미리 합의해두세요.",
+      action: "공유 캘린더를 만들어 이번 달 데이트 두 개를 등록하되, 하나는 일부러 \u2018장소 미정\u2019으로 남겨 즉흥 근육 기르기." });
+  } else {
+    tips.push({ tag: "라이프스타일", title: "둘 다 즉흥파(P) — 자유로운 영혼들, 마감만 이중화",
+      body: "\u201C지금 갈까?\u201D 한 마디면 출발하는, 인생이 여행 같은 커플입니다. 계획 스트레스가 없는 대신 예약 마감, 기념일, 공과금 같은 \u2018날짜 있는 것들\u2019이 둘 사이의 사각지대로 빠집니다. 서로 \u2018네가 챙길 줄 알았지\u2019가 반복되면 자유가 원망으로 변합니다.",
+      action: "중요한 예약과 기념일만 골라 둘 다의 폰에 알림 이중화 — 딱 5개만 정해서 등록하기." });
+  }
+  // 특수 처방
+  const sameCount = AXES.filter(ax => A[ax.key] === B[ax.key]).length;
+  if (sameCount === 4) {
+    tips.push({ tag: "특별 처방", title: "네 축 완전 일치 — 편안함의 재능, 사각지대의 공유",
+      body: "16×16 조합 중에서도 드문, 세상을 같은 문법으로 읽는 커플입니다. 설명이 필요 없는 편안함이 최대 무기지만, 강점이 겹치면 약점도 겹칩니다 — 둘 다 같은 것을 놓치고, 같은 방향으로 무너질 수 있다는 뜻입니다. 가끔 일부러 서로의 반대 역할(악마의 변호인)을 맡아 결정을 점검해보세요. \u2018우리 지금 둘 다 못 보고 있는 게 뭘까?\u2019가 이 커플의 마법 질문입니다.",
+      action: "큰 결정(이사, 큰 지출, 여행지) 전에 한 명이 일부러 반대 입장에서 5분간 따져보는 \u2018레드팀 타임\u2019 갖기." });
+  } else if (sameCount === 0) {
+    tips.push({ tag: "특별 처방", title: "네 축 완전 반대 — 서로가 서로의 번역가",
+      body: "모든 축이 반대라는 건 매 순간 다른 언어를 쓴다는 뜻이자, 상대가 내가 못 보는 세상 절반을 대신 봐준다는 뜻입니다. 갈등의 총량은 많을 수 있지만, 잘 번역된 반대 조합은 어떤 동일 조합보다 넓은 시야를 가집니다. 핵심은 \u2018다름 = 틀림\u2019 회로를 끊는 것 하나입니다.",
+      action: "다툼이 났을 때 \u201C너는 왜 그래?\u201D 대신 \u201C네 눈에는 이게 어떻게 보여?\u201D로 첫 문장 바꾸기." });
+  }
+  if (golden) {
+    tips.push({ tag: "보너스", title: "✨ 이론상 천생연분 조합의 사용 설명서",
+      body: "두 유형은 성격 이론에서 서로의 부족한 기능을 자연스럽게 메워주는 보완 관계로 자주 언급되는 조합입니다. 다만 \u2018천생연분\u2019은 자동 완성이 아니라 잠재력의 이름입니다 — 보완 관계는 존중이 있을 때 시너지가 되고, 존중이 없을 때 가장 신랄한 비난의 재료가 됩니다. 서로의 다른 점을 \u2018고칠 것\u2019이 아니라 \u2018빌려 쓸 것\u2019으로 대하는 순간 이 조합의 진가가 나옵니다.",
+      action: null });
+  }
+  tips.push({ tag: "마무리", title: "이 리포트를 쓰는 법",
+    body: "검사 결과는 판정이 아니라 대화의 출발점입니다. 점수 자체보다, 각 항목을 함께 읽으며 \u201C이거 진짜 우리 얘기다\u201D와 \u201C이건 좀 아닌데?\u201D를 나누는 시간이 진짜 궁합을 만듭니다. 특히 \u2018아닌데?\u2019가 나온 항목이야말로 서로를 새로 알게 되는 가장 좋은 입구입니다.",
+    action: "리포트를 같이 보며 가장 공감된 항목 1개, 가장 동의 안 되는 항목 1개를 서로 골라 이유 말해보기." });
   return { cats, total, golden, tips };
 }
 function totalLabel(t) {
@@ -391,6 +460,69 @@ function AxisCompare({ axis, a, b, nameA, nameB }) {
     </div>
   );
 }
+// 처방전 + 미션 체크: 커플 조합별 키로 이 기기(localStorage)에 진행률 저장
+function PrescriptionList({ tips, coupleKey }) {
+  const storeKey = "lovefit_missions_" + coupleKey;
+  const [done, setDone] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(storeKey) || "{}"); } catch (e) { return {}; }
+  });
+  const toggle = i => {
+    const nd = { ...done, [i]: !done[i] };
+    setDone(nd);
+    try { localStorage.setItem(storeKey, JSON.stringify(nd)); } catch (e) { /* 저장 불가 환경은 세션 내 상태만 유지 */ }
+  };
+  const actionable = tips.map((t, i) => ({ t, i })).filter(x => x.t.action);
+  const doneCnt = actionable.filter(x => done[x.i]).length;
+  const pct = actionable.length ? Math.round((doneCnt / actionable.length) * 100) : 0;
+  const cardS = { background: "#FFFBFC", border: `1.5px solid ${C.me}33`, borderRadius: 18, padding: 20, marginBottom: 14 };
+  return (
+    <div className="pop3" style={cardS}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 4 }}>
+        <div style={{ fontSize: 15, fontWeight: 900 }}>💊 두 사람을 위한 처방전</div>
+        <div style={{ fontSize: 12.5, fontWeight: 900, color: pct === 100 ? C.good : C.me }}>
+          {pct === 100 ? "🎉 미션 올클리어!" : `미션 달성 ${doneCnt} / ${actionable.length}`}
+        </div>
+      </div>
+      <div style={{ height: 8, background: "#F7EEF0", borderRadius: 99, overflow: "hidden", marginBottom: 8 }}>
+        <div style={{ width: `${pct}%`, height: "100%", background: `linear-gradient(90deg, ${C.me}, ${C.you})`, borderRadius: 99, transition: "width .3s" }} />
+      </div>
+      <div style={{ fontSize: 11.5, color: C.sub, marginBottom: 14 }}>
+        네 개의 축마다 우리 조합만을 위한 처방과 미션이 담겨 있어요. 미션을 해냈다면 🎯 버튼을 눌러 체크! (체크는 이 기기에 저장돼요 — 서로의 폰에서 각자 체크하고 달성률을 비교해보는 것도 재미)
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {tips.map((t, i) => (
+          <div key={i} style={{ background: C.paper, border: `1px solid ${done[i] ? C.good + "66" : C.line}`, borderRadius: 14, padding: "16px 16px 14px", transition: "border .2s" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 7 }}>
+              <span style={{ fontSize: 15, fontWeight: 900, color: C.me }}>{String(i + 1).padStart(2, "0")}</span>
+              <Chip bg={t.tag === "특별 처방" || t.tag === "보너스" ? C.youSoft : C.meSoft} color={t.tag === "특별 처방" || t.tag === "보너스" ? C.you : C.me}>{t.tag}</Chip>
+              <span style={{ fontSize: 14, fontWeight: 900, color: C.ink }}>{t.title}</span>
+            </div>
+            <div style={{ fontSize: 13, color: C.sub, lineHeight: 1.8, marginBottom: t.action ? 10 : 0 }}>{t.body}</div>
+            {t.action && (
+              <button onClick={() => toggle(i)} style={{
+                display: "flex", gap: 8, alignItems: "flex-start", width: "100%", boxSizing: "border-box", textAlign: "left",
+                background: done[i] ? C.goodSoft : `${C.me}0D`, border: `1px dashed ${done[i] ? C.good : C.me + "55"}`,
+                borderRadius: 10, padding: "9px 12px", cursor: "pointer", fontFamily: font, transition: "all .2s",
+              }}>
+                <span style={{ fontSize: 14 }}>{done[i] ? "✅" : "🎯"}</span>
+                <span style={{ fontSize: 12.5, lineHeight: 1.7 }}>
+                  <b style={{ color: done[i] ? C.good : C.me }}>{done[i] ? "미션 완료" : "이번 주 미션"}</b>{" "}
+                  <span style={{ color: C.sub, textDecoration: done[i] ? "line-through" : "none", opacity: done[i] ? 0.65 : 1 }}>· {t.action}</span>
+                </span>
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+      {pct === 100 && (
+        <div style={{ marginTop: 14, textAlign: "center", background: C.goodSoft, borderRadius: 12, padding: "12px 14px", fontSize: 13, fontWeight: 800, color: C.good }}>
+          🏆 모든 미션 완료! 이 정도면 궁합 점수에 +α를 붙여도 됩니다. 다음 시즌 스토리에서 다시 만나요.
+        </div>
+      )}
+    </div>
+  );
+}
+
 function TypeCard({ name, type, scores, accent, soft, roleLabel }) {
   const T = TYPES[type];
   return (
@@ -547,8 +679,8 @@ function LoveFit() {
                 <span style={{ display: "block", fontSize: "clamp(40px, 8vw, 66px)", fontWeight: 900, background: "linear-gradient(90deg, #A99BFF, #CFC6FF)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>궁합은 선택의 합.</span>
               </h1>
               <p className="pop3" style={{ fontSize: 14.5, color: "#CDBFCC", lineHeight: 1.75, maxWidth: 520, margin: "0 0 18px" }}>
-                설문지가 아니라 <b style={{ color: "#fff" }}>\u2018어느 연애의 사계절\u2019 12장면</b> 속에서 선택합니다.
-                선택이 쌓이면 MBTI가 되고, 링크를 받은 연인이 같은 이야기를 지나면 —
+                설문지가 아니라 <b style={{ color: "#fff" }}>‘어느 연애의 사계절’ 12장면</b> 속에서 선택합니다.<br />
+                선택이 쌓이면 MBTI가 되고, 링크를 받은 연인이 같은 이야기를 지나면 —<br />
                 둘의 <b style={{ color: "#FFB0CB" }}>궁합이 숫자와 문장</b>으로 도착합니다.
               </p>
               <div className="pop3" style={{ display: "flex", gap: 3, marginBottom: 20, fontSize: 24, flexWrap: "wrap" }}>
@@ -866,17 +998,7 @@ function LoveFit() {
             ))}
           </div>
 
-          <div className="pop3" style={{ ...card, marginBottom: 14, background: "#FFFBFC", border: `1.5px solid ${C.me}33` }}>
-            <div style={{ fontSize: 13.5, fontWeight: 900, marginBottom: 10 }}>💡 두 사람을 위한 처방전</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {rep.tips.map((t, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, fontSize: 13, color: C.sub, lineHeight: 1.7 }}>
-                  <span style={{ fontWeight: 900, color: C.me }}>{String(i + 1).padStart(2, "0")}</span>
-                  <span>{t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <PrescriptionList tips={rep.tips} coupleKey={encodeURIComponent(`${A.t}_${A.n}_${B.t}_${B.n}`)} />
 
           <div className="pop3" style={{ ...card, textAlign: "center" }}>
             <div style={{ fontSize: 15, fontWeight: 900, marginBottom: 12 }}>이 결과, 함께 봐야 진짜죠</div>
