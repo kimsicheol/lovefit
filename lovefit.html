@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>러브핏 — 스토리로 읽는 우리의 궁합</title>
+<meta property="og:title" content="러브핏 — 스토리로 읽는 우리의 궁합" />
+<meta property="og:description" content="어느 연애의 사계절, 12장면의 선택으로 읽는 MBTI 궁합. 링크를 보내면 둘의 케미가 숫자로 나옵니다." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://lovefit.vercel.app" />
+<meta property="og:image" content="https://lovefit.vercel.app/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<style>html,body{margin:0;padding:0;background:#FBF6F4}</style>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const { useState, useMemo, useEffect } = React;
+
+// ---------- Design tokens ----------
+const C = {
+  bg: "#FBF6F4", paper: "#FFFFFF", ink: "#241624", sub: "#7A6470", line: "#F0E1E4",
+  me: "#E8447A", meSoft: "#FDE7EF",          // 나 (핑크)
+  you: "#6C5CE8", youSoft: "#EDEAFD",        // 상대 (퍼플)
+  warmth: "#F2734B", warmthSoft: "#FEEDE4",  // 여름 스테이지
+  gold: "#F2B441", warn: "#D9772B", good: "#0E9B6C", goodSoft: "#E4F5EE",
+};
+const font = "'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif";
+
+// ---------- MBTI 축 ----------
+// 점수 규약: 양수 = E / S / T / J, 음수 = I / N / F / P
+const AXES = [
+  { key: "EI", pos: "E", neg: "I", posName: "외향", negName: "내향", cat: "에너지·데이트 리듬" },
+  { key: "SN", pos: "S", neg: "N", posName: "현실", negName: "상상", cat: "대화·세계관" },
+  { key: "TF", pos: "T", neg: "F", posName: "이성", negName: "감성", cat: "마음 표현·갈등 해결" },
+  { key: "JP", pos: "J", neg: "P", posName: "계획", negName: "즉흥", cat: "라이프스타일" },
+];
+function lettersOf(scores) {
+  return AXES.map(a => (scores[a.key] >= 0 ? a.pos : a.neg)).join("");
+}
+function strengthPct(v) { return Math.max(52, Math.min(96, Math.round(50 + Math.abs(v) * 1.4))); }
+
+// ---------- 16유형 캐릭터 ----------
+const TYPES = {
+  INTJ: { emoji: "🦉", name: "새벽의 전략가", line: "\u201C사랑도 인생 설계의 가장 중요한 변수.\u201D", love: "말수는 적지만 한 사람에게 깊고 길게 집중합니다. 신뢰가 쌓이면 누구보다 헌신적인 파트너.", best: ["ENFP", "ENTP"] },
+  INTP: { emoji: "🔭", name: "호기심의 관측자", line: "\u201C당신이라는 세계가 궁금해서 계속 봅니다.\u201D", love: "표현은 서툴러도 상대를 이해하려는 탐구심은 진심. 대화가 통하는 순간 마음의 문이 열립니다.", best: ["ENTJ", "ESTJ"] },
+  ENTJ: { emoji: "👑", name: "직진의 리더", line: "\u201C좋아하면 계획부터 세웁니다. 우리의 미래까지.\u201D", love: "밀당 없는 정면 돌파형. 연애에도 목표와 성장을 담고, 함께 레벨업할 파트너를 찾습니다.", best: ["INTP", "INFP"] },
+  ENTP: { emoji: "🦊", name: "불꽃 티키타카", line: "\u201C싸우는 게 아니라 대화가 재밌는 겁니다.\u201D", love: "말장난과 토론이 곧 애정 표현. 지루할 틈 없는 연애를 만들지만 꾸준함은 상대가 채워줘야 합니다.", best: ["INFJ", "INTJ"] },
+  INFJ: { emoji: "🌙", name: "고요한 등대", line: "\u201C당신이 말하지 않은 마음까지 듣고 있어요.\u201D", love: "소수의 사람에게 깊은 애정을 쏟는 타입. 의미 없는 만남은 못 하고, 시작하면 오래갑니다.", best: ["ENTP", "ENFP"] },
+  INFP: { emoji: "🌸", name: "낭만 수집가", line: "\u201C우리의 모든 순간이 한 편의 이야기.\u201D", love: "이상적인 사랑을 믿는 진심파. 사소한 기념일과 감정의 결을 소중히 여기는 로맨티스트입니다.", best: ["ENFJ", "ENTJ"] },
+  ENFJ: { emoji: "🌻", name: "다정한 온기", line: "\u201C네가 웃으면 그걸로 오늘은 성공.\u201D", love: "상대의 기분을 먼저 읽고 챙기는 배려형. 주는 사랑에 익숙해 가끔은 받는 연습이 필요합니다.", best: ["INFP", "ISFP"] },
+  ENFP: { emoji: "🎈", name: "심장 폭죽", line: "\u201C오늘도 너 때문에 세상이 축제.\u201D", love: "표현이 크고 에너지가 넘치는 연애 낙천주의자. 설렘을 오래 유지하는 재주가 있습니다.", best: ["INFJ", "INTJ"] },
+  ISTJ: { emoji: "📘", name: "약속의 사람", line: "\u201C화려한 말 대신, 한 번 한 약속은 지킵니다.\u201D", love: "표현은 담백해도 행동으로 증명하는 신뢰형. 기념일을 캘린더에 먼저 넣어두는 사람입니다.", best: ["ESFP", "ESTP"] },
+  ISFJ: { emoji: "🤍", name: "곁의 수호자", line: "\u201C티 안 나게, 그러나 항상 챙기고 있어요.\u201D", love: "상대의 사소한 취향까지 기억하는 세심함이 무기. 헌신적이지만 서운함은 쌓아두는 편입니다.", best: ["ESTP", "ESFP"] },
+  ESTJ: { emoji: "🧭", name: "든든한 기둥", line: "\u201C사랑은 책임. 내 사람은 내가 지킵니다.\u201D", love: "현실적인 문제를 대신 해결해주는 해결사형 애정. 무뚝뚝해 보여도 속은 순정파입니다.", best: ["INTP", "ISTP"] },
+  ESFJ: { emoji: "🎀", name: "분위기 요정", line: "\u201C우리 주변까지 행복해야 진짜 행복.\u201D", love: "이벤트·기념일·서프라이즈의 달인. 관계에 정성을 쏟는 만큼 리액션이 큰 상대와 잘 맞습니다.", best: ["ISFP", "ISTP"] },
+  ISTP: { emoji: "🔧", name: "무심한 스윗", line: "\u201C말보다 고쳐주고, 데려다주고, 해결해줍니다.\u201D", love: "간섭 없는 편안한 연애를 선호. 표현은 드물지만 필요한 순간 가장 실질적인 도움을 줍니다.", best: ["ESFJ", "ESTJ"] },
+  ISFP: { emoji: "🎨", name: "감성 온도계", line: "\u201C지금 이 공기, 이 노래, 그리고 너.\u201D", love: "함께 있는 순간의 감각을 즐기는 힐링형. 다그치지 않는 상대 곁에서 가장 예쁘게 피어납니다.", best: ["ENFJ", "ESFJ"] },
+  ESTP: { emoji: "⚡", name: "스릴 메이커", line: "\u201C고민은 배송만 늦출 뿐. 일단 만나자.\u201D", love: "즉흥 데이트와 화끈한 표현의 소유자. 지금 이 순간을 가장 뜨겁게 사는 연애를 합니다.", best: ["ISFJ", "ISTJ"] },
+  ESFP: { emoji: "🎉", name: "연애 만렙 인싸", line: "\u201C너랑 있으면 평일도 불금.\u201D", love: "리액션·애교·이벤트 삼박자. 관계의 즐거움을 만드는 데 천재적인 재능이 있습니다.", best: ["ISTJ", "ISFJ"] },
+};
+// 이론상 보완 관계로 자주 언급되는 조합 — 궁합 보너스 +6
+const GOLDEN = new Set(["INFP-ENFJ","INFP-ENTJ","ENFP-INFJ","ENFP-INTJ","INTP-ENTJ","INTP-ESTJ","ENTP-INFJ","ENTP-INTJ","ISFP-ENFJ","ISFP-ESFJ","ESFP-ISTJ","ESFP-ISFJ","ESTP-ISFJ","ESTP-ISTJ","ISTP-ESFJ","ISTP-ESTJ"]);
+function isGolden(a, b) { return GOLDEN.has(`${a}-${b}`) || GOLDEN.has(`${b}-${a}`); }
+
+// ========== 스토리형 검사 · 어느 연애의 사계절 ==========
+// [측정 블루프린트] 시즌 스킨은 갈아끼워도 슬롯별 측정 축·효과 크기(±11 주효과)는 고정:
+// 1 EI / 2 SN / 3 JP / 4 TF   (1부 · 봄)
+// 5 EI / 6 SN / 7 TF / 8 JP   (2부 · 여름)
+// 9 TF / 10 EI / 11 SN / 12 JP (3부 · 겨울)
+// 각 축은 정확히 3회씩 측정 → 재검사·변형 로테이션에도 결과가 안정적으로 수렴한다.
+const SEASON = "사계절 v1";
+const STORY_POOL = [
+  [ // 1 · EI
+    { scene: "🌸", grad: ["#FFD7E2", "#FF8FB1"], title: "봄 · 소개팅 다음 날",
+      text: "어제 소개팅, 분위기가 정말 좋았다.\n그런데 오늘 오후, 폰이 조용하다. 당신의 다음 수는—",
+      options: [
+        { label: "먼저 전화한다. 목소리로 해야 마음이 산다.", eff: { EI: 11 } },
+        { label: "톡으로 가볍게 안부. 답장을 기다리는 설렘도 좋다.", eff: { EI: -4 } },
+        { label: "오늘은 어제의 여운을 혼자 곱씹는다. 연락은 내일.", eff: { EI: -11 } },
+      ] },
+    { scene: "☕", grad: ["#FFD7E2", "#FF8FB1"], title: "봄 · 두 번째 만남 장소",
+      text: "두 번째 데이트 장소를 정할 차례.\n\u201C어디서 볼까요?\u201D 라는 메시지에 당신의 답은—",
+      options: [
+        { label: "사람 북적이는 핫플 거리. 그 에너지가 좋다.", eff: { EI: 11 } },
+        { label: "조용한 골목 카페. 둘의 대화에만 집중하고 싶다.", eff: { EI: -11 } },
+        { label: "상대가 좋아하는 곳이면 어디든 좋다.", eff: { EI: -4 } },
+      ] },
+  ],
+  [ // 2 · SN
+    { scene: "🌇", grad: ["#FFE3C2", "#FFA26B"], title: "봄 · 한강의 노을",
+      text: "첫 데이트, 한강. 노을이 강물에 번진다.\n상대가 묻는다. \u201C지금 무슨 생각해요?\u201D",
+      options: [
+        { label: "\u201C저 노을 색 진짜 예쁘다. 오늘 바람도 딱 좋고.\u201D — 지금 이 순간", eff: { SN: 11 } },
+        { label: "\u201C10년 뒤 우리는 어디서 뭘 하고 있을까, 문득 그런 생각.\u201D", eff: { SN: -11 } },
+      ] },
+    { scene: "🍝", grad: ["#FFE3C2", "#FFA26B"], title: "봄 · 골목 맛집",
+      text: "찾아낸 골목 맛집, 드디어 음식이 나왔다.\n첫 입을 먹고 자연스럽게 나오는 말은—",
+      options: [
+        { label: "\u201C면 익힘 완벽하다. 소스에 뭐 들어갔지?\u201D — 디테일 품평", eff: { SN: 11 } },
+        { label: "\u201C이 가게, 무슨 사연으로 이 골목에 생겼을까?\u201D — 상상 발동", eff: { SN: -11 } },
+      ] },
+  ],
+  [ // 3 · JP
+    { scene: "📅", grad: ["#D9E8FF", "#8FB3FF"], title: "봄 · 데이트 전날 밤",
+      text: "내일은 종일 데이트. 자기 전 당신의 상태는—",
+      options: [
+        { label: "코스·시간·식당 예약까지 완료. 플랜B도 있다.", eff: { JP: 11 } },
+        { label: "만나서 정하지 뭐. 발길 닿는 대로가 진짜 데이트.", eff: { JP: -11 } },
+        { label: "큰 틀만 잡아두고 나머지는 현장 기분에 맡긴다.", eff: { JP: 4 } },
+      ] },
+    { scene: "🎬", grad: ["#D9E8FF", "#8FB3FF"], title: "봄 · 매진된 영화",
+      text: "보러 온 영화가 매진됐다. 상대가 당신을 쳐다본다.",
+      options: [
+        { label: "예매 안 한 게 찝찝하다. 다음 회차 기준으로 일정 재정비.", eff: { JP: 11 } },
+        { label: "\u201C오히려 좋아.\u201D 근처 아무 곳이나, 새로운 모험 시작.", eff: { JP: -11 } },
+      ] },
+  ],
+  [ // 4 · TF
+    { scene: "💬", grad: ["#E4F5EE", "#7EDBB4"], title: "봄 · 밤 10시의 하소연",
+      text: "\u201C나 오늘 팀장님한테 엄청 깨졌어…\u201D\n풀 죽은 목소리의 전화. 당신의 첫 반응은—",
+      options: [
+        { label: "\u201C헐, 많이 속상했겠다.\u201D 마음부터 안아준다.", eff: { TF: -11 } },
+        { label: "상황을 차근차근 듣고 해결 방법을 같이 찾는다.", eff: { TF: 11 } },
+        { label: "일단 충분히 공감, 그다음 살짝 솔루션을 얹는다.", eff: { TF: -4 } },
+      ] },
+    { scene: "🤒", grad: ["#E4F5EE", "#7EDBB4"], title: "봄 · 감기 걸린 그 사람",
+      text: "\u201C나 감기 걸린 것 같아…\u201D 힘없는 메시지가 왔다.",
+      options: [
+        { label: "\u201C약 먹었어? 병원은? 죽 시켜줄까?\u201D 체크리스트 가동.", eff: { TF: 11 } },
+        { label: "\u201C에구, 목소리 듣고 싶다. 옆에 있어주고 싶네.\u201D", eff: { TF: -11 } },
+      ] },
+  ],
+  [ // 5 · EI
+    { scene: "🏖️", grad: ["#FFE9B8", "#F2B441"], title: "여름 · 친구들 모임 초대",
+      text: "상대의 친구들 모임에 초대받았다. 처음 보는 사람 여섯 명.",
+      options: [
+        { label: "완전 좋다! 사람들 속에서 더 빨리 가까워질 기회.", eff: { EI: 11 } },
+        { label: "가긴 가지만, 끝나고 에너지 방전은 각오한다.", eff: { EI: -4 } },
+        { label: "둘이 보내는 시간이 더 좋은데… 정중히 다음을 기약.", eff: { EI: -11 } },
+      ] },
+    { scene: "🎪", grad: ["#FFE9B8", "#F2B441"], title: "여름 · 토요일의 선택지",
+      text: "이번 주말, 뮤직 페스티벌 티켓이 생겼다. 하지만 집에서 보내는 홈데이트도 가능하다.",
+      options: [
+        { label: "페스티벌! 인파와 함성도 축제의 일부다.", eff: { EI: 11 } },
+        { label: "집에서 영화에 배달 음식. 그게 완벽한 하루.", eff: { EI: -11 } },
+      ] },
+  ],
+  [ // 6 · SN
+    { scene: "🎁", grad: ["#FCE0EE", "#F08BC0"], title: "여름 · 생일 선물 고르기",
+      text: "상대의 생일이 일주일 앞. 당신이 고르는 선물은—",
+      options: [
+        { label: "위시리스트에 있던 그 실용템. 확실한 만족 보장.", eff: { SN: 11 } },
+        { label: "둘의 이야기를 담은, 세상에 하나뿐인 무언가.", eff: { SN: -11 } },
+      ] },
+    { scene: "✈️", grad: ["#FCE0EE", "#F08BC0"], title: "여름 · 첫 여행지 정하기",
+      text: "첫 커플 여행. 지도를 펼쳐놓고 당신이 끌리는 곳은—",
+      options: [
+        { label: "후기 검증 완료, 동선 좋은 곳. 실패 없는 여행.", eff: { SN: 11 } },
+        { label: "아무도 모르는 곳. 우리만의 이야기가 생길 곳.", eff: { SN: -11 } },
+      ] },
+  ],
+  [ // 7 · TF
+    { scene: "⏰", grad: ["#FFD3C2", "#FF8E6E"], title: "여름 · 30분의 지각",
+      text: "약속 시간에서 30분. 저 멀리서 상대가 미안하다며 뛰어온다.",
+      options: [
+        { label: "\u201C무슨 일 있었어? 안 다쳤으면 됐어.\u201D — 마음이 먼저", eff: { TF: -11 } },
+        { label: "괜찮다고 하되, \u201C다음엔 미리 연락 줘\u201D — 원칙은 말한다", eff: { TF: 11 } },
+      ] },
+    { scene: "💸", grad: ["#FFD3C2", "#FF8E6E"], title: "여름 · 데이트 통장 제안",
+      text: "상대가 진지하게 데이트 통장 규칙을 제안했다. 비율과 사용처까지 정리해서.",
+      options: [
+        { label: "합리적이다. 그 자리에서 규칙을 함께 다듬는다.", eff: { TF: 11 } },
+        { label: "맞는 말인데… 돈 얘기가 살짝 서운한 건 어쩔 수 없다.", eff: { TF: -11 } },
+      ] },
+  ],
+  [ // 8 · JP
+    { scene: "🧳", grad: ["#D6F2E3", "#5FD9AE"], title: "여름 · 여행 D-1",
+      text: "내일은 드디어 첫 커플 여행. 오늘 밤 당신의 모습은—",
+      options: [
+        { label: "짐 리스트 체크 완료, 시간대별 동선까지 정리했다.", eff: { JP: 11 } },
+        { label: "충전기랑 지갑이면 됐지. 나머지는 현지 조달.", eff: { JP: -11 } },
+      ] },
+    { scene: "🚗", grad: ["#D6F2E3", "#5FD9AE"], title: "여름 · 휴무의 습격",
+      text: "여행 중, 가려던 식당이 하필 휴무다. 배는 고프다.",
+      options: [
+        { label: "이럴 줄 알고 2안·3안 리스트가 이미 있다.", eff: { JP: 11 } },
+        { label: "골목을 뒤지다 발견한 집이 인생 맛집이 되는 법.", eff: { JP: -11 } },
+      ] },
+  ],
+  [ // 9 · TF (갈등 앵커 — 시즌 교체 시에도 유지해 점수 동등화에 사용)
+    { scene: "❄️", grad: ["#C9D4E8", "#7A8FBF"], title: "겨울 · 처음으로 냉랭해진 밤",
+      text: "사소한 말투 하나로 공기가 얼어붙었다.\n먼저 입을 여는 당신의 첫 문장은—",
+      options: [
+        { label: "\u201C정확히 뭐가 문제였는지, 사실부터 정리해보자.\u201D", eff: { TF: 11 } },
+        { label: "\u201C논리보다 먼저… 나 사실 그 말에 서운했어.\u201D", eff: { TF: -11 } },
+        { label: "\u201C오늘은 각자 정리하고, 내일 차분히 얘기하자.\u201D", eff: { TF: 4 } },
+      ] },
+    { scene: "📱", grad: ["#C9D4E8", "#7A8FBF"], title: "겨울 · 답장 없는 6시간",
+      text: "읽씹도 아닌 안읽씹 6시간. 드디어 \u201C미안, 폰을 두고 나갔어\u201D 라는 답이 왔다.",
+      options: [
+        { label: "그럴 수 있지. 상황을 확인했으니 깔끔하게 정리 끝.", eff: { TF: 11 } },
+        { label: "머리로는 이해해도, 걱정 반 서운함 반이었던 마음을 전한다.", eff: { TF: -11 } },
+      ] },
+  ],
+  [ // 10 · EI
+    { scene: "🎄", grad: ["#FFD7E2", "#B78FFF"], title: "겨울 · 연말 계획",
+      text: "12월 31일 밤. 당신이 그리는 완벽한 카운트다운은—",
+      options: [
+        { label: "친구들 다 모아 파티. 다 같이 새해를 맞는다.", eff: { EI: 11 } },
+        { label: "둘이서 조용히, 따뜻한 방 안에서 새해를 맞는다.", eff: { EI: -11 } },
+      ] },
+    { scene: "😮‍💨", grad: ["#FFD7E2", "#B78FFF"], title: "겨울 · 방전된 하루의 끝",
+      text: "일이 유난히 고됐던 날. 당신의 회복 버튼은—",
+      options: [
+        { label: "사람을 만나 수다로 푼다. 연인이면 더 좋다.", eff: { EI: 11 } },
+        { label: "일단 혼자 조용히 충전. 회복된 다음에 만난다.", eff: { EI: -11 } },
+      ] },
+  ],
+  [ // 11 · SN
+    { scene: "🔮", grad: ["#E4D9FF", "#A88BFF"], title: "겨울 · \u201C우리 나중에…\u201D",
+      text: "이불 속에서 상대가 묻는다. \u201C우리 나중에 어떻게 살고 있을까?\u201D",
+      options: [
+        { label: "현실 플랜부터: 저축, 집, 구체적인 타임라인.", eff: { SN: 11 } },
+        { label: "그림부터: 어떤 공기, 어떤 분위기의 삶일지 상상.", eff: { SN: -11 } },
+      ] },
+    { scene: "🏠", grad: ["#E4D9FF", "#A88BFF"], title: "겨울 · 드림하우스 대화",
+      text: "언젠가 함께 살 집 이야기가 나왔다. 당신이 먼저 꺼내는 화제는—",
+      options: [
+        { label: "역세권·평수·금리. 숫자가 맞아야 꿈도 산다.", eff: { SN: 11 } },
+        { label: "창밖 풍경과 아침 햇살. 분위기가 맞아야 집이 산다.", eff: { SN: -11 } },
+      ] },
+  ],
+  [ // 12 · JP
+    { scene: "💍", grad: ["#FFE3C2", "#F2B441"], title: "겨울 · 100일 기념일",
+      text: "다가오는 100일. 당신의 준비 스타일은—",
+      options: [
+        { label: "몇 주 전부터 레스토랑 예약, 선물, 타임라인 완비.", eff: { JP: 11 } },
+        { label: "당일의 기분과 영감이 최고의 이벤트를 만든다.", eff: { JP: -11 } },
+      ] },
+    { scene: "🗓️", grad: ["#FFE3C2", "#F2B441"], title: "겨울 · 커플 버킷리스트",
+      text: "함께 하고 싶은 것들을 적어보기로 했다. 당신의 방식은—",
+      options: [
+        { label: "시즌별로 정리해서 하나씩 클리어. 달성률이 곧 추억.", eff: { JP: 11 } },
+        { label: "리스트는 영감일 뿐. 끌리는 날, 끌리는 걸 한다.", eff: { JP: -11 } },
+      ] },
+  ],
+];
+const STAGES = [
+  { name: "봄 · 처음의 온도", sub: "설렘 속 선택 4장면", color: C.me, soft: C.meSoft },
+  { name: "여름 · 둘만의 계절", sub: "함께하는 시간 4장면", color: C.warmth, soft: C.warmthSoft },
+  { name: "겨울 · 진심의 계절", sub: "갈등과 미래 4장면", color: C.you, soft: C.youSoft },
+];
+const WEEKLY_DONE = 214;
+
+// [무성의 응답 대응] 선택지 표시 순서 셔플 — '항상 1번' 전략 무력화
+function seededShuffle(arr, seed) {
+  const a = [...arr];
+  let s = seed;
+  for (let i = a.length - 1; i > 0; i--) {
+    s = (s * 9301 + 49297) % 233280;
+    const j = Math.floor((s / 233280) * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+// [재검사 로테이션] 이미 본 변형 대신 새 변형 우선 배정 — 축·효과크기 고정이라 결과는 수렴
+function loadSeen() { try { return JSON.parse(localStorage.getItem("lovefit_seen") || "{}"); } catch (e) { return {}; } }
+function markSeen(list) {
+  try {
+    const seen = loadSeen();
+    list.forEach((sc, i) => { const s = new Set(seen[i] || []); s.add(sc._v); seen[i] = [...s]; });
+    localStorage.setItem("lovefit_seen", JSON.stringify(seen));
+  } catch (e) { /* 저장 불가 환경은 시드 로테이션 폴백 */ }
+}
+
+// ---------- 링크 페이로드 ----------
+function enc(obj) { return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))).replace(/=+$/, ""); }
+function dec(s) { try { return JSON.parse(decodeURIComponent(escape(atob(s)))); } catch (e) { return null; } }
+function baseUrl() { return location.origin + location.pathname; }
+function copyText(text, done) {
+  const fallback = () => {
+    const ta = document.createElement("textarea");
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); done(true); } catch (e) { done(false); }
+    document.body.removeChild(ta);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => done(true)).catch(fallback);
+  } else fallback();
+}
+
+// ---------- 궁합 계산 ----------
+function axisRel(a, b, key) { return a[key] === b[key] ? "same" : "diff"; }
+function coupleReport(tA, tB) {
+  const A = { EI: tA[0], SN: tA[1], TF: tA[2], JP: tA[3] };
+  const B = { EI: tB[0], SN: tB[1], TF: tB[2], JP: tB[3] };
+  const cats = [];
+  // 대화·세계관 (S/N) — 궁합의 뼈대
+  if (axisRel(A, B, "SN") === "same") {
+    cats.push({ icon: "🗣️", name: "대화 케미", score: 24, max: 25,
+      text: A.SN === "N" ? "둘 다 상상파(N). \u201C만약에\u201D 하나로 새벽까지 대화가 이어지는 조합입니다." : "둘 다 현실파(S). 말이 겉돌지 않고, 계획과 실행의 합이 잘 맞습니다." });
+  } else {
+    cats.push({ icon: "🗣️", name: "대화 케미", score: 14, max: 25,
+      text: "현실(S)과 상상(N)의 만남. 대화의 초점이 어긋날 때가 있지만, 서로의 시선이 못 보던 세계를 열어줍니다. \u2018다른 게 아니라 새로운 것\u2019이라고 번역하는 게 핵심." });
+  }
+  // 마음 표현·갈등 (T/F)
+  if (axisRel(A, B, "TF") === "same") {
+    cats.push({ icon: "🕊️", name: "갈등 해결", score: 22, max: 25,
+      text: A.TF === "F" ? "둘 다 감성파(F). 서운함을 마음으로 먼저 풀어주는 다정한 화해가 가능합니다. 단, 둘 다 상처를 오래 품는 편이니 표현은 빠르게." : "둘 다 이성파(T). 감정 소모 없이 문제 자체로 직진하는 깔끔한 화해. 가끔은 \u2018맞고 틀림\u2019 대신 \u2018고맙고 미안함\u2019도 챙기세요." });
+  } else {
+    cats.push({ icon: "🕊️", name: "갈등 해결", score: 15, max: 25,
+      text: "이성(T)과 감성(F)의 만남 — 다툼의 단골 코스이자, 잘 맞추면 최강의 균형. F에게는 \u2018공감 먼저 해결 나중\u2019, T에게는 \u2018지적이 아니라 관심\u2019이라는 번역기가 필요합니다." });
+  }
+  // 에너지·데이트 (E/I)
+  if (axisRel(A, B, "EI") === "diff") {
+    cats.push({ icon: "🔋", name: "에너지 밸런스", score: 21, max: 25,
+      text: "외향(E)과 내향(I)의 조합. 한 사람은 세상 밖으로, 한 사람은 둘의 안으로 이끌어 데이트의 스펙트럼이 넓어집니다. 각자의 충전 방식만 존중하면 최고의 보완재." });
+  } else if (A.EI === "E") {
+    cats.push({ icon: "🔋", name: "에너지 밸런스", score: 19, max: 25,
+      text: "둘 다 외향(E). 데이트 일정이 마르지 않는 활발한 커플. 가끔은 둘만의 조용한 시간도 일부러 만들어야 관계가 깊어집니다." });
+  } else {
+    cats.push({ icon: "🔋", name: "에너지 밸런스", score: 20, max: 25,
+      text: "둘 다 내향(I). 집이 가장 완벽한 데이트 장소인 아늑한 커플. 서로의 혼자 시간을 침범하지 않는 것만으로 신뢰가 쌓입니다." });
+  }
+  // 라이프스타일 (J/P)
+  if (axisRel(A, B, "JP") === "same") {
+    cats.push({ icon: "🧭", name: "라이프스타일", score: A.JP === "J" ? 21 : 19, max: 25,
+      text: A.JP === "J" ? "둘 다 계획파(J). 여행 엑셀이 두 개 만들어지는 커플. 일정 충돌만 조율하면 인생 설계까지 함께 굴러갑니다." : "둘 다 즉흥파(P). \u201C지금 갈까?\u201D 한 마디면 출발하는 자유로운 커플. 예약과 마감만 서로 챙겨주면 완벽합니다." });
+  } else {
+    cats.push({ icon: "🧭", name: "라이프스타일", score: 15, max: 25,
+      text: "계획(J)과 즉흥(P)의 만남. 준비하는 사람과 유연한 사람의 분업이 이뤄지면 최강의 여행 파트너 — 다만 \u2018왜 계획 안 해\u2019와 \u2018왜 숨 막히게 해\u2019 사이의 번역이 숙제입니다." });
+  }
+  const golden = isGolden(tA, tB);
+  let total = cats.reduce((s, c) => s + c.score, 0) + 3 + (golden ? 6 : 0);
+  total = Math.max(50, Math.min(99, total));
+  // 조언
+  const tips = [];
+  if (axisRel(A, B, "TF") === "diff") tips.push("싸움의 90%는 여기서 납니다: F가 서운함을 말할 때 T는 해결책보다 \u201C많이 서운했겠다\u201D를 먼저. T가 피드백할 땐 F는 \u2018공격이 아니라 관심\u2019으로 받기.");
+  if (axisRel(A, B, "SN") === "diff") tips.push("S는 N의 \u2018뜬구름\u2019에 한 번 올라타 주고, N은 S의 \u2018현실 체크\u2019를 브레이크가 아닌 안전벨트로 여겨주세요.");
+  if (axisRel(A, B, "JP") === "diff") tips.push("여행·기념일은 J가 뼈대를 잡고 P가 살을 붙이는 분업이 정답. 계획의 30%는 비워두기로 미리 합의하세요.");
+  if (axisRel(A, B, "EI") === "diff") tips.push("E의 모임 데이와 I의 홈 데이를 번갈아 배치하면 둘 다 충전됩니다. \u2018같이 있지만 각자 노는 시간\u2019도 훌륭한 데이트.");
+  if (tips.length === 0) tips.push("네 축이 모두 같은 희귀 조합. 편안함이 최대 무기지만, 둘 다 같은 걸 놓치는 사각지대가 생깁니다. 가끔은 일부러 서로의 반대 역할을 맡아보세요.");
+  tips.push("검사 결과는 대화의 출발점이지 판정이 아닙니다. 점수보다 각 항목의 설명을 함께 읽는 시간이 진짜 궁합을 만듭니다.");
+  return { cats, total, golden, tips };
+}
+function totalLabel(t) {
+  if (t >= 92) return { g: "S", word: "운명의 상성", desc: "이론상 천생연분 구간" };
+  if (t >= 84) return { g: "A", word: "찰떡 케미", desc: "노력 대비 효율 최고의 조합" };
+  if (t >= 74) return { g: "B", word: "성장형 케미", desc: "맞춰갈수록 단단해지는 조합" };
+  return { g: "C", word: "번역기 필수 케미", desc: "다름이 큰 만큼 배울 것도 큰 조합" };
+}
+function scoreColor(s) { return s >= 84 ? C.good : s >= 70 ? C.gold : C.warn; }
+
+// ---------- 공용 소품 ----------
+function Chip({ children, bg, color }) {
+  return <span style={{ fontSize: 11, padding: "3px 9px", borderRadius: 999, background: bg || "#F5EDEF", color: color || C.sub, fontWeight: 700, whiteSpace: "nowrap" }}>{children}</span>;
+}
+function Dial({ score, label, size = 84, center }) {
+  const col = scoreColor(score);
+  return (
+    <div style={{ textAlign: "center" }}>
+      <div style={{ width: size, height: size, borderRadius: "50%", margin: "0 auto", background: `conic-gradient(${col} ${score * 3.6}deg, #F3E8EA 0deg)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ width: size - 16, height: size - 16, borderRadius: "50%", background: C.paper, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: size / 3.4, color: col }}>
+          {center || score}
+        </div>
+      </div>
+      {label && <div style={{ fontSize: 11.5, color: C.sub, marginTop: 5, fontWeight: 700 }}>{label}</div>}
+    </div>
+  );
+}
+// 축 비교 바: 왼쪽 = 음(I/N/F/P), 오른쪽 = 양(E/S/T/J)
+function AxisCompare({ axis, a, b, nameA, nameB }) {
+  const posOf = v => Math.max(4, Math.min(96, 50 + v * 1.4));
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, fontWeight: 800, marginBottom: 4 }}>
+        <span style={{ color: C.sub }}>{axis.neg} · {axis.negName}</span>
+        <span style={{ fontSize: 10.5, color: "#B7A6AE" }}>{axis.cat}</span>
+        <span style={{ color: C.sub }}>{axis.posName} · {axis.pos}</span>
+      </div>
+      <div style={{ position: "relative", height: 26, background: "#F7EEF0", borderRadius: 99 }}>
+        <div style={{ position: "absolute", left: "50%", top: 4, bottom: 4, width: 1.5, background: "#E4D4D8" }} />
+        {a != null && <div title={nameA} style={{ position: "absolute", left: `${posOf(a)}%`, top: "50%", transform: "translate(-50%,-50%)", width: 18, height: 18, borderRadius: "50%", background: C.me, border: "2.5px solid #fff", boxShadow: "0 1px 4px rgba(0,0,0,.2)" }} />}
+        {b != null && <div title={nameB} style={{ position: "absolute", left: `${posOf(b)}%`, top: "50%", transform: "translate(-50%,-50%)", width: 18, height: 18, borderRadius: "50%", background: C.you, border: "2.5px solid #fff", boxShadow: "0 1px 4px rgba(0,0,0,.2)" }} />}
+      </div>
+    </div>
+  );
+}
+function TypeCard({ name, type, scores, accent, soft, roleLabel }) {
+  const T = TYPES[type];
+  return (
+    <div style={{ flex: "1 1 250px", background: soft, borderRadius: 18, padding: "18px 18px 14px", border: `1.5px solid ${accent}33` }}>
+      <div style={{ fontSize: 11.5, fontWeight: 800, color: accent }}>{roleLabel}</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "8px 0 6px" }}>
+        <span style={{ fontSize: 46, lineHeight: 1 }}>{T.emoji}</span>
+        <div>
+          <div style={{ fontSize: 21, fontWeight: 900, color: C.ink }}>{name}</div>
+          <div style={{ fontSize: 13.5, fontWeight: 900, color: accent }}>{type} · {T.name}</div>
+        </div>
+      </div>
+      <div style={{ fontSize: 12.5, fontStyle: "italic", color: accent, marginBottom: 6 }}>{T.line}</div>
+      <div style={{ fontSize: 12.5, color: C.sub, lineHeight: 1.6 }}>{T.love}</div>
+      {scores && (
+        <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 10 }}>
+          {AXES.map(ax => {
+            const v = scores[ax.key];
+            const letter = v >= 0 ? ax.pos : ax.neg;
+            return <Chip key={ax.key} bg="#ffffffB3" color={accent}>{letter} {strengthPct(v)}%</Chip>;
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------- 메인 ----------
+function LoveFit() {
+  const [invite, setInvite] = useState(null);   // 초대 페이로드 {n, t, s}
+  const [coupleView, setCoupleView] = useState(null); // 결과 공유 링크 {a:{n,t,s}, b:{n,t,s}}
+  const [mode, setMode] = useState("home");     // home | name | quiz | result | couple
+  const [phase, setPhase] = useState("quiz");   // quiz | rest
+  const [myName, setMyName] = useState("");
+  const [nameDraft, setNameDraft] = useState("");
+  const [stage, setStage] = useState(0);
+  const [qIdx, setQIdx] = useState(0);
+  const [answers, setAnswers] = useState(Array(12).fill(null));
+  const [posLog, setPosLog] = useState(Array(12).fill(null));
+  const [sceneMs, setSceneMs] = useState(Array(12).fill(null));
+  const [qStart, setQStart] = useState(Date.now());
+  const [seed, setSeed] = useState(() => Math.floor(Math.random() * 100000));
+  const [copied, setCopied] = useState("");
+
+  useEffect(() => {
+    const h = location.hash;
+    if (h.startsWith("#invite=")) { const p = dec(h.slice(8)); if (p && p.t && TYPES[p.t]) setInvite(p); }
+    else if (h.startsWith("#couple=")) { const p = dec(h.slice(8)); if (p && p.a && p.b && TYPES[p.a.t] && TYPES[p.b.t]) { setCoupleView(p); setMode("couple"); } }
+  }, []);
+
+  const activeStory = useMemo(() => {
+    const seen = loadSeen();
+    return STORY_POOL.map((slot, i) => {
+      const seenList = seen[i] || [];
+      const fresh = slot.map((_, vi) => vi).filter(vi => !seenList.includes(vi));
+      const pick = fresh.length ? fresh[(seed + i * 7) % fresh.length] : (seed + i * 7) % slot.length;
+      return { ...slot[pick], _v: pick };
+    });
+  }, [seed]);
+  const orders = useMemo(() => activeStory.map((sc, i) => seededShuffle([...sc.options.keys()], seed * 13 + i + 1)), [activeStory, seed]);
+
+  const scores = useMemo(() => {
+    const s = { EI: 0, SN: 0, TF: 0, JP: 0 };
+    activeStory.forEach((sc, i) => {
+      const a = answers[i];
+      if (a == null) return;
+      Object.entries(sc.options[a].eff).forEach(([k, v]) => { s[k] += v; });
+    });
+    return s;
+  }, [answers, activeStory]);
+  const myType = lettersOf(scores);
+  const allDone = answers.every(a => a != null);
+
+  const reliability = useMemo(() => {
+    if (!allDone) return null;
+    const counts = {};
+    posLog.forEach(p => { if (p != null) counts[p] = (counts[p] || 0) + 1; });
+    const maxSame = Math.max(0, ...Object.values(counts));
+    const times = sceneMs.filter(t => t != null).sort((a, b) => a - b);
+    const median = times.length ? times[Math.floor(times.length / 2)] : 99999;
+    const flags = [];
+    if (maxSame >= 10) flags.push("같은 위치 반복");
+    if (median < 1400) flags.push("응답 속도 과다");
+    return { level: flags.length === 0 ? "높음" : flags.length === 1 ? "보통" : "확인 필요", flags };
+  }, [allDone, posLog, sceneMs]);
+
+  const resetTest = () => {
+    setStage(0); setPhase("quiz"); setQIdx(0);
+    setAnswers(Array(12).fill(null)); setPosLog(Array(12).fill(null)); setSceneMs(Array(12).fill(null));
+    setSeed(Math.floor(Math.random() * 100000)); setQStart(Date.now());
+  };
+  const startTest = () => { resetTest(); setMode("name"); setNameDraft(""); };
+
+  const shell = { minHeight: "100vh", background: C.bg, fontFamily: font, color: C.ink, display: "flex", flexDirection: "column", alignItems: "center" };
+  const card = { background: C.paper, border: `1px solid ${C.line}`, borderRadius: 18, padding: 20 };
+  const btn = (bg, color = "#fff") => ({ background: bg, color, border: "none", borderRadius: 13, padding: "13px 24px", fontSize: 15, fontWeight: 800, cursor: "pointer", fontFamily: font });
+
+  const css = `
+    @keyframes drift { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(-28px,20px) scale(1.15)} 100%{transform:translate(0,0) scale(1)} }
+    @keyframes drift2 { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(36px,-22px) scale(1.2)} 100%{transform:translate(0,0) scale(1)} }
+    @keyframes popIn { 0%{opacity:0; transform:translateY(14px)} 100%{opacity:1; transform:translateY(0)} }
+    @keyframes pulseGlow { 0%,100%{box-shadow:0 0 0 0 rgba(232,68,122,.55)} 50%{box-shadow:0 0 0 14px rgba(232,68,122,0)} }
+    @keyframes wobble { 0%,100%{transform:rotate(-4deg)} 50%{transform:rotate(4deg)} }
+    @keyframes beat { 0%,100%{transform:scale(1)} 12%{transform:scale(1.18)} 24%{transform:scale(1)} 36%{transform:scale(1.12)} 48%{transform:scale(1)} }
+    .pop{animation:popIn .45s ease both} .pop2{animation:popIn .45s .12s ease both} .pop3{animation:popIn .45s .24s ease both}
+    .glow{animation:pulseGlow 2.2s infinite} .wob{animation:wobble 2.4s ease-in-out infinite} .beat{animation:beat 1.6s ease-in-out infinite}
+    @media (prefers-reduced-motion: reduce){ *{animation:none !important} }
+  `;
+
+  const Header = (
+    <div style={{ width: "100%", maxWidth: 780, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "18px 20px 6px", flexWrap: "wrap", gap: 8 }}>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 10, cursor: "pointer" }} onClick={() => { location.hash = ""; setMode("home"); }}>
+        <span style={{ fontSize: 30, fontWeight: 900, letterSpacing: -1.2, lineHeight: 1 }}>
+          러브<span style={{ background: `linear-gradient(90deg, ${C.me}, ${C.you})`, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>핏</span>
+        </span>
+        <span style={{ fontSize: 12, color: C.sub, fontWeight: 700 }}>스토리로 읽는 우리의 궁합</span>
+      </div>
+      {mode !== "home" && (
+        <button onClick={() => { location.hash = ""; setMode("home"); }} style={{ background: "transparent", border: `1px solid ${C.line}`, borderRadius: 10, padding: "7px 14px", fontSize: 13, fontWeight: 700, color: C.sub, cursor: "pointer", fontFamily: font }}>처음으로</button>
+      )}
+    </div>
+  );
+
+  const copyBtn = (key, text, label, bg) => (
+    <button className={key === "invite" ? "glow" : ""} style={{ ...btn(bg || C.me), fontSize: 15 }}
+      onClick={() => copyText(text, ok => { setCopied(ok ? key : "fail"); setTimeout(() => setCopied(""), 2200); })}>
+      {copied === key ? "복사 완료! 이제 붙여넣기만 하세요 ✓" : label}
+    </button>
+  );
+
+  // ================= 홈 =================
+  if (mode === "home") {
+    const invitedBy = invite;
+    return (
+      <div style={shell}>
+        <style>{css}</style>
+        {Header}
+        <div style={{ width: "100%", maxWidth: 780, padding: "16px 20px 60px" }}>
+          <div style={{ borderRadius: 26, padding: "48px 32px 40px", color: "#fff", position: "relative", overflow: "hidden", background: "linear-gradient(135deg, #1C0F1E 0%, #2A1533 55%, #14162E 100%)" }}>
+            <div style={{ position: "absolute", right: -60, top: -70, width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle, rgba(232,68,122,.5), transparent 65%)", animation: "drift 9s ease-in-out infinite", filter: "blur(6px)" }} />
+            <div style={{ position: "absolute", left: -80, bottom: -60, width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle, rgba(108,92,232,.55), transparent 65%)", animation: "drift2 11s ease-in-out infinite", filter: "blur(8px)" }} />
+            <div style={{ position: "relative" }}>
+              {invitedBy ? (
+                <div className="pop" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,.12)", border: "1px solid rgba(255,255,255,.22)", borderRadius: 999, padding: "8px 16px", fontSize: 13.5, fontWeight: 800 }}>
+                  💌 <b style={{ color: "#FFB0CB" }}>{invitedBy.n}</b>님이 궁합 테스트에 초대했어요
+                </div>
+              ) : (
+                <div className="pop" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,.1)", border: "1px solid rgba(255,255,255,.18)", borderRadius: 999, padding: "7px 16px", fontSize: 13, fontWeight: 800 }}>
+                  💘 이번 주 <span style={{ color: C.gold }}>{WEEKLY_DONE}쌍</span>이 궁합을 확인했어요
+                </div>
+              )}
+              <h1 className="pop2" style={{ margin: "24px 0 12px", lineHeight: 1.08, letterSpacing: -2.2 }}>
+                <span style={{ display: "block", fontSize: "clamp(40px, 8vw, 66px)", fontWeight: 900, background: "linear-gradient(90deg, #FF8FB1, #FFC2D6)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>연애는 스토리,</span>
+                <span style={{ display: "block", fontSize: "clamp(40px, 8vw, 66px)", fontWeight: 900, background: "linear-gradient(90deg, #A99BFF, #CFC6FF)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>궁합은 선택의 합.</span>
+              </h1>
+              <p className="pop3" style={{ fontSize: 14.5, color: "#CDBFCC", lineHeight: 1.75, maxWidth: 520, margin: "0 0 18px" }}>
+                설문지가 아니라 <b style={{ color: "#fff" }}>\u2018어느 연애의 사계절\u2019 12장면</b> 속에서 선택합니다.
+                선택이 쌓이면 MBTI가 되고, 링크를 받은 연인이 같은 이야기를 지나면 —
+                둘의 <b style={{ color: "#FFB0CB" }}>궁합이 숫자와 문장</b>으로 도착합니다.
+              </p>
+              <div className="pop3" style={{ display: "flex", gap: 3, marginBottom: 20, fontSize: 24, flexWrap: "wrap" }}>
+                {Object.values(TYPES).slice(0, 12).map((t, i) => <span key={i} title={t.name}>{t.emoji}</span>)}
+                <span style={{ fontSize: 12.5, color: "#A793A4", fontWeight: 700, alignSelf: "center", marginLeft: 8 }}>16가지 연애 유형 중 우리는?</span>
+              </div>
+              {invitedBy && (
+                <div className="pop3" style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.16)", borderRadius: 16, padding: "12px 16px", marginBottom: 20, maxWidth: 460 }}>
+                  <span className="wob" style={{ fontSize: 44, filter: "blur(6px)", display: "inline-block" }}>{TYPES[invitedBy.t].emoji}</span>
+                  <div style={{ fontSize: 13, lineHeight: 1.6, color: "#E4D8E2" }}>
+                    <b style={{ color: "#fff" }}>{invitedBy.n}</b>님의 유형은 이미 도착해 있어요.<br />
+                    당신이 이야기를 끝내는 순간, 베일이 벗겨지고 궁합이 공개됩니다.
+                  </div>
+                </div>
+              )}
+              <div className="pop3" style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 26 }}>
+                <button className="glow" style={{ ...btn(C.me), fontSize: 17, padding: "16px 30px", borderRadius: 15 }} onClick={startTest}>
+                  {invitedBy ? "이야기 시작하고 궁합 확인 →" : "90초 스토리로 내 유형 확인 →"}
+                </button>
+              </div>
+              <div style={{ display: "flex", gap: 26, flexWrap: "wrap" }}>
+                {[["12장면", "정답 없는 선택"], ["16유형", "연애 성향 캐릭터"], ["±5%", "재검사 결과 오차 설계"]].map(([n, l]) => (
+                  <div key={l}>
+                    <div style={{ fontSize: 24, fontWeight: 900 }}>{n}</div>
+                    <div style={{ fontSize: 11.5, color: "#A793A4", fontWeight: 700 }}>{l}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 12, marginTop: 14 }}>
+            {STAGES.map((s, i) => (
+              <div key={s.name} style={{ ...card, borderTop: `4px solid ${s.color}` }}>
+                <Chip bg={s.soft} color={s.color}>{i + 1}부 · 4장면</Chip>
+                <div style={{ fontSize: 16, fontWeight: 800, margin: "10px 0 4px" }}>{s.name}</div>
+                <div style={{ fontSize: 13, color: C.sub, lineHeight: 1.6 }}>{s.sub}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ ...card, marginTop: 12, display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
+            <span style={{ fontSize: 30 }}>🔁</span>
+            <div style={{ fontSize: 12.5, color: C.sub, lineHeight: 1.7, flex: "1 1 300px" }}>
+              장면은 접속할 때마다 로테이션되지만, 각 장면이 <b style={{ color: C.ink }}>측정하는 축과 크기는 고정</b>되어 있어
+              다시 검사해도 결과가 거의 같게 나오도록 설계했습니다. 커플이 서로 다른 문항을 받아도 공정한 이유입니다.
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ================= 이름 입력 =================
+  if (mode === "name") {
+    return (
+      <div style={shell}>
+        <style>{css}</style>
+        {Header}
+        <div style={{ width: "100%", maxWidth: 480, padding: "40px 20px 60px" }}>
+          <div className="pop" style={{ ...card, textAlign: "center", padding: "36px 26px" }}>
+            <div className="beat" style={{ fontSize: 56, display: "inline-block" }}>💌</div>
+            <div style={{ fontSize: 20, fontWeight: 900, margin: "12px 0 6px" }}>
+              {invite ? `${invite.n}님이 기다리고 있어요` : "이야기의 주인공 이름은?"}
+            </div>
+            <p style={{ fontSize: 13, color: C.sub, lineHeight: 1.7, margin: "0 0 18px" }}>
+              결과 카드와 궁합 리포트에 표시될 이름(닉네임)을 알려주세요.
+            </p>
+            <input value={nameDraft} onChange={e => setNameDraft(e.target.value)} maxLength={10} placeholder="예) 시철, 자기야, 곰돌이"
+              onKeyDown={e => { if (e.key === "Enter" && nameDraft.trim()) { setMyName(nameDraft.trim()); setMode("quiz"); setPhase("quiz"); setQStart(Date.now()); } }}
+              style={{ width: "100%", boxSizing: "border-box", padding: "14px 16px", borderRadius: 13, border: `1.5px solid ${C.line}`, fontSize: 16, fontWeight: 700, fontFamily: font, outline: "none", textAlign: "center", marginBottom: 16 }} />
+            <button disabled={!nameDraft.trim()} style={{ ...btn(C.me), width: "100%", opacity: nameDraft.trim() ? 1 : 0.4 }}
+              onClick={() => { setMyName(nameDraft.trim()); setMode("quiz"); setPhase("quiz"); setQStart(Date.now()); }}>
+              1부 · 봄의 이야기 시작 →
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ================= 검사 =================
+  if (mode === "quiz") {
+    const st = STAGES[stage];
+    const items = activeStory.slice(stage * 4, stage * 4 + 4);
+    const stageAnswered = items.filter((_, i) => answers[stage * 4 + i] != null).length;
+
+    if (phase === "rest") {
+      const next = STAGES[stage + 1];
+      const teaser = TYPES[myType];
+      const blurPx = stage === 0 ? 8 : 4;
+      return (
+        <div style={shell}>
+          <style>{css}</style>
+          {Header}
+          <div style={{ width: "100%", maxWidth: 540, padding: "36px 20px 60px" }}>
+            <div className="pop" style={{ ...card, textAlign: "center", padding: "34px 24px" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: st.color, marginBottom: 12 }}>{stage + 1}부 완료 ✓</div>
+              <div className="wob" style={{ fontSize: 72, filter: `blur(${blurPx}px)`, display: "inline-block", marginBottom: 6 }}>{teaser.emoji}</div>
+              <div style={{ fontSize: 19, fontWeight: 900, marginBottom: 4 }}>
+                {myName}님, 지금까지의 선택은 <span style={{ color: C.me }}>{myType[0]}?{myType[2]}?</span> 쪽이에요
+              </div>
+              <p style={{ fontSize: 13.5, color: C.sub, lineHeight: 1.7, margin: "0 0 16px" }}>
+                하지만 아직 확정이 아닙니다 — {stage === 0 ? "여름의 선택이 방향을 바꿀 수 있어요." : "겨울, 갈등의 계절이 진짜 성향을 드러냅니다."}
+              </p>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: next.soft, borderRadius: 12, padding: "10px 16px", marginBottom: 18 }}>
+                <span style={{ fontSize: 12.5, fontWeight: 800, color: next.color }}>다음 · {stage + 2}부 {next.name}</span>
+                <span style={{ fontSize: 12, color: C.sub }}>4장면 · 약 30초</span>
+              </div>
+              <div>
+                <button style={{ ...btn(next.color), fontSize: 16, padding: "14px 34px" }}
+                  onClick={() => { setStage(stage + 1); setPhase("quiz"); setQIdx(0); setQStart(Date.now()); }}>
+                  계속하기 →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const qu = items[qIdx];
+    const gIdx = stage * 4 + qIdx;
+    const advance = () => {
+      setQStart(Date.now());
+      if (qIdx < 3) setQIdx(qIdx + 1);
+      else if (stage < 2) setPhase("rest");
+      else { markSeen(activeStory); setMode("result"); }
+    };
+    return (
+      <div style={shell}>
+        <style>{css}</style>
+        {Header}
+        <div style={{ width: "100%", maxWidth: 600, padding: "14px 20px 60px" }}>
+          <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+            {STAGES.map((s, i) => (
+              <div key={s.name} style={{ flex: 1, textAlign: "center" }}>
+                <div style={{ height: 6, borderRadius: 99, background: i < stage ? s.color : i === stage ? s.soft : "#F1E7E9", overflow: "hidden" }}>
+                  {i === stage && <div style={{ width: `${(stageAnswered / 4) * 100}%`, height: "100%", background: s.color, transition: "width .25s" }} />}
+                </div>
+                <div style={{ fontSize: 10.5, fontWeight: 800, marginTop: 5, color: i === stage ? s.color : i < stage ? C.ink : "#C9B8BF" }}>
+                  {i + 1}부 {s.name.split(" · ")[0]}{i < stage ? " ✓" : ""}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="pop" style={{ ...card }} key={`${stage}-${qIdx}`}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, flexWrap: "wrap", gap: 6 }}>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                <Chip bg={st.soft} color={st.color}>{stage + 1}부 · {st.name}</Chip>
+                <Chip bg="#FFF6E4" color="#B07B14">📖 {SEASON}</Chip>
+              </div>
+              <span style={{ fontSize: 12, fontWeight: 700, color: C.sub }}>장면 {gIdx + 1} / 12</span>
+            </div>
+            <div style={{ margin: "2px 0 12px" }}>
+              <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", padding: "30px 0", textAlign: "center", background: `linear-gradient(135deg, ${qu.grad[0]}, ${qu.grad[1]})` }}>
+                <div style={{ position: "absolute", left: -34, top: -34, width: 150, height: 150, borderRadius: "50%", background: "rgba(255,255,255,.24)" }} />
+                <div style={{ position: "absolute", right: -26, bottom: -46, width: 130, height: 130, borderRadius: "50%", background: "rgba(0,0,0,.08)" }} />
+                <div className="wob" style={{ fontSize: 82, lineHeight: 1, position: "relative", display: "inline-block", filter: "drop-shadow(0 6px 12px rgba(0,0,0,.16))" }}>{qu.scene}</div>
+              </div>
+              <div style={{ fontSize: 13.5, fontWeight: 800, color: st.color, marginTop: 10, textAlign: "center" }}>{qu.title}</div>
+            </div>
+            <div style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.75, marginBottom: 18, whiteSpace: "pre-line" }}>{qu.text}</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {orders[gIdx].map((origIdx, di) => {
+                const op = qu.options[origIdx];
+                const on = answers[gIdx] === origIdx;
+                return (
+                  <button key={op.label} onClick={() => {
+                    const na = [...answers]; na[gIdx] = origIdx; setAnswers(na);
+                    const np = [...posLog]; np[gIdx] = di; setPosLog(np);
+                    const nt = [...sceneMs]; nt[gIdx] = Date.now() - qStart; setSceneMs(nt);
+                    setTimeout(advance, 200);
+                  }} style={{ textAlign: "left", padding: "13px 16px", borderRadius: 13, cursor: "pointer", fontFamily: font, fontSize: 14.5, lineHeight: 1.55, fontWeight: on ? 800 : 600, border: `1.5px solid ${on ? st.color : C.line}`, background: on ? st.soft : C.paper, color: on ? st.color : C.ink }}>
+                    {op.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-start", marginTop: 14 }}>
+            <button disabled={qIdx === 0} onClick={() => setQIdx(qIdx - 1)}
+              style={{ ...btn("transparent", C.sub), border: `1px solid ${C.line}`, opacity: qIdx === 0 ? 0.4 : 1, padding: "10px 18px", fontSize: 13.5 }}>이전 장면</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ================= 결과 =================
+  const mePayload = { n: myName, t: myType, s: scores };
+
+  if (mode === "result" && !invite) {
+    const T = TYPES[myType];
+    const inviteLink = `${baseUrl()}#invite=${enc(mePayload)}`;
+    const shareMsg = `💘 러브핏 궁합 테스트\n\n나(${myName})의 연애 유형이 나왔어!\n너도 90초 스토리 테스트하면 우리 궁합이 바로 나와 👇\n${inviteLink}`;
+    return (
+      <div style={shell}>
+        <style>{css}</style>
+        {Header}
+        <div style={{ width: "100%", maxWidth: 780, padding: "14px 20px 60px" }}>
+          <div className="pop" style={{ borderRadius: 22, padding: "30px 26px", color: "#fff", marginBottom: 14, position: "relative", overflow: "hidden", background: "linear-gradient(135deg, #1C0F1E, #33152B)" }}>
+            <div style={{ position: "absolute", right: -50, top: -50, width: 260, height: 260, borderRadius: "50%", background: "radial-gradient(circle, rgba(232,68,122,.45), transparent 65%)" }} />
+            <div style={{ position: "relative", display: "flex", gap: 22, flexWrap: "wrap", alignItems: "center" }}>
+              <div className="beat" style={{ fontSize: 92, lineHeight: 1 }}>{T.emoji}</div>
+              <div style={{ flex: "1 1 280px" }}>
+                <div style={{ fontSize: 12.5, fontWeight: 800, color: C.gold }}>{myName}님의 연애 유형</div>
+                <div style={{ fontSize: 30, fontWeight: 900, margin: "4px 0 2px" }}>{myType} <span style={{ fontSize: 17, fontWeight: 700, color: "#D9C6D6" }}>— {T.name}</span></div>
+                <div style={{ fontSize: 14.5, fontStyle: "italic", color: "#FFB0CB", margin: "6px 0 10px" }}>{T.line}</div>
+                <p style={{ fontSize: 13.5, color: "#D6C7D3", lineHeight: 1.7, margin: "0 0 12px" }}>{T.love}</p>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+                  {AXES.map(ax => {
+                    const v = scores[ax.key];
+                    return <Chip key={ax.key} bg="rgba(255,255,255,.14)" color="#FFE0EC">{v >= 0 ? ax.pos : ax.neg} · {v >= 0 ? ax.posName : ax.negName} {strengthPct(v)}%</Chip>;
+                  })}
+                </div>
+                <Chip bg="rgba(108,92,232,.3)" color="#CFC6FF">💜 이론상 찰떡 · {T.best.map(b => `${TYPES[b].emoji}${b}`).join("  ")}</Chip>
+                {reliability && (
+                  <div style={{ marginTop: 10 }}>
+                    <Chip bg="rgba(255,255,255,.14)" color={reliability.level === "높음" ? "#7EDBB4" : "#FFE0A8"}>응답 신뢰도 · {reliability.level}{reliability.flags.length ? ` (${reliability.flags.join(" · ")})` : ""}</Chip>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="pop2" style={{ ...card, textAlign: "center", padding: "28px 24px", marginBottom: 14, border: `2px dashed ${C.me}66`, background: "#FFFBFC" }}>
+            <div className="beat" style={{ fontSize: 40, display: "inline-block" }}>💌</div>
+            <div style={{ fontSize: 19, fontWeight: 900, margin: "8px 0 6px" }}>이제 반쪽의 이야기가 필요해요</div>
+            <p style={{ fontSize: 13.5, color: C.sub, lineHeight: 1.7, margin: "0 0 16px" }}>
+              아래 버튼으로 링크를 복사해 연인에게 보내세요.<br />
+              상대가 같은 사계절 이야기를 끝내는 순간, <b style={{ color: C.me }}>둘의 궁합 리포트</b>가 완성됩니다.
+            </p>
+            <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+              {copyBtn("invite", shareMsg, "💘 초대 메시지 복사하기 (카톡용)", C.me)}
+              {copyBtn("link", inviteLink, "🔗 링크만 복사", "#3D2A3A")}
+            </div>
+            <div style={{ fontSize: 11, color: "#B7A6AE", marginTop: 12 }}>* 링크에는 이름과 유형 결과만 담깁니다. 개별 답변 내용은 전송되지 않습니다.</div>
+          </div>
+
+          <div className="pop3" style={{ ...card }}>
+            <div style={{ fontSize: 12.5, fontWeight: 800, color: C.you, marginBottom: 12 }}>나의 4축 상세</div>
+            {AXES.map(ax => <AxisCompare key={ax.key} axis={ax} a={scores[ax.key]} b={null} nameA={myName} nameB="" />)}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 4 }}>
+              <button onClick={() => { resetTest(); setMode("quiz"); }} style={{ ...btn("transparent", C.sub), border: `1px solid ${C.line}`, padding: "8px 16px", fontSize: 12.5 }}>다른 장면으로 다시 검사</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ================= 커플 결과 (초대받은 사람 완료 or 공유 링크 열람) =================
+  if (mode === "result" && invite || mode === "couple") {
+    const A = mode === "couple" ? coupleView.a : invite;         // 초대한 사람 (핑크)
+    const B = mode === "couple" ? coupleView.b : mePayload;      // 응답한 사람 (퍼플)
+    const rep = coupleReport(A.t, B.t);
+    const grade = totalLabel(rep.total);
+    const coupleLink = `${baseUrl()}#couple=${enc({ a: { n: A.n, t: A.t, s: A.s }, b: { n: B.n, t: B.t, s: B.s } })}`;
+    const shareMsg = `💞 러브핏 궁합 결과\n\n${A.n}(${A.t}) ❤ ${B.n}(${B.t})\n궁합 ${rep.total}점 · ${grade.word}!\n\n전체 리포트 보기 👇\n${coupleLink}`;
+    return (
+      <div style={shell}>
+        <style>{css}</style>
+        {Header}
+        <div style={{ width: "100%", maxWidth: 780, padding: "14px 20px 60px" }}>
+          <div className="pop" style={{ borderRadius: 22, padding: "32px 26px", color: "#fff", marginBottom: 14, position: "relative", overflow: "hidden", background: "linear-gradient(135deg, #1C0F1E, #2A1533, #14162E)" }}>
+            <div style={{ position: "absolute", right: -50, top: -60, width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(232,68,122,.45), transparent 65%)" }} />
+            <div style={{ position: "absolute", left: -60, bottom: -70, width: 260, height: 260, borderRadius: "50%", background: "radial-gradient(circle, rgba(108,92,232,.5), transparent 65%)" }} />
+            <div style={{ position: "relative", textAlign: "center" }}>
+              <div style={{ fontSize: 12.5, fontWeight: 800, color: C.gold, marginBottom: 12 }}>💞 우리의 궁합 리포트{rep.golden ? " · ✨ 이론상 천생연분 조합" : ""}</div>
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "clamp(10px, 4vw, 28px)", flexWrap: "wrap" }}>
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ fontSize: 62, lineHeight: 1 }}>{TYPES[A.t].emoji}</div>
+                  <div style={{ fontSize: 16, fontWeight: 900, marginTop: 6 }}>{A.n}</div>
+                  <div style={{ fontSize: 12.5, fontWeight: 800, color: "#FFB0CB" }}>{A.t} · {TYPES[A.t].name}</div>
+                </div>
+                <div style={{ textAlign: "center" }}>
+                  <div className="beat" style={{ fontSize: 34, display: "inline-block" }}>❤️</div>
+                  <div style={{ fontSize: "clamp(46px, 9vw, 64px)", fontWeight: 900, lineHeight: 1, background: "linear-gradient(90deg, #FF8FB1, #CFC6FF)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>{rep.total}</div>
+                  <div style={{ fontSize: 14, fontWeight: 900, color: "#FFE0EC", marginTop: 2 }}>{grade.g}등급 · {grade.word}</div>
+                  <div style={{ fontSize: 11.5, color: "#B9A6B6", marginTop: 2 }}>{grade.desc}</div>
+                </div>
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ fontSize: 62, lineHeight: 1 }}>{TYPES[B.t].emoji}</div>
+                  <div style={{ fontSize: 16, fontWeight: 900, marginTop: 6 }}>{B.n}</div>
+                  <div style={{ fontSize: 12.5, fontWeight: 800, color: "#CFC6FF" }}>{B.t} · {TYPES[B.t].name}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="pop2" style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 14 }}>
+            <TypeCard name={A.n} type={A.t} scores={A.s} accent={C.me} soft={C.meSoft} roleLabel="💗 먼저 검사한 사람" />
+            <TypeCard name={B.n} type={B.t} scores={B.s} accent={C.you} soft={C.youSoft} roleLabel="💜 초대받은 사람" />
+          </div>
+
+          <div className="pop2" style={{ ...card, marginBottom: 14 }}>
+            <div style={{ fontSize: 12.5, fontWeight: 800, color: C.me, marginBottom: 14 }}>4축 겹쳐보기 <span style={{ fontWeight: 700, color: C.sub }}>· <span style={{ color: C.me }}>●</span> {A.n} <span style={{ color: C.you }}>●</span> {B.n}</span></div>
+            {AXES.map(ax => <AxisCompare key={ax.key} axis={ax} a={(A.s || {})[ax.key] ?? ((A.t.includes(ax.pos) ? 20 : -20))} b={(B.s || {})[ax.key] ?? ((B.t.includes(ax.pos) ? 20 : -20))} nameA={A.n} nameB={B.n} />)}
+            <div style={{ fontSize: 11, color: "#B7A6AE" }}>* 점이 가까울수록 같은 성향, 멀수록 보완 관계입니다. 같음도 다름도 각각의 강점이 있어요.</div>
+          </div>
+
+          <div className="pop3" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12, marginBottom: 14 }}>
+            {rep.cats.map(cat => (
+              <div key={cat.name} style={{ ...card, padding: 18 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <span style={{ fontSize: 14.5, fontWeight: 900 }}>{cat.icon} {cat.name}</span>
+                  <span style={{ fontSize: 15, fontWeight: 900, color: scoreColor(cat.score / cat.max * 100) }}>{cat.score}<span style={{ fontSize: 11.5, color: "#C9B8BF" }}> / {cat.max}</span></span>
+                </div>
+                <div style={{ height: 7, background: "#F7EEF0", borderRadius: 99, overflow: "hidden", marginBottom: 10 }}>
+                  <div style={{ width: `${(cat.score / cat.max) * 100}%`, height: "100%", background: `linear-gradient(90deg, ${C.me}, ${C.you})`, borderRadius: 99 }} />
+                </div>
+                <div style={{ fontSize: 12.5, color: C.sub, lineHeight: 1.7 }}>{cat.text}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="pop3" style={{ ...card, marginBottom: 14, background: "#FFFBFC", border: `1.5px solid ${C.me}33` }}>
+            <div style={{ fontSize: 13.5, fontWeight: 900, marginBottom: 10 }}>💡 두 사람을 위한 처방전</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {rep.tips.map((t, i) => (
+                <div key={i} style={{ display: "flex", gap: 10, fontSize: 13, color: C.sub, lineHeight: 1.7 }}>
+                  <span style={{ fontWeight: 900, color: C.me }}>{String(i + 1).padStart(2, "0")}</span>
+                  <span>{t}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="pop3" style={{ ...card, textAlign: "center" }}>
+            <div style={{ fontSize: 15, fontWeight: 900, marginBottom: 12 }}>이 결과, 함께 봐야 진짜죠</div>
+            <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+              {copyBtn("couple", shareMsg, "💞 결과 메시지 복사하기 (카톡용)", C.me)}
+              {copyBtn("clink", coupleLink, "🔗 결과 링크만 복사", "#3D2A3A")}
+              <button onClick={() => { location.hash = ""; setInvite(null); setCoupleView(null); startTest(); }} style={{ ...btn("transparent", C.sub), border: `1px solid ${C.line}` }}>나도 처음부터 해보기</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<LoveFit />);
+</script>
+</body>
+</html>
