@@ -7,8 +7,8 @@
 <meta property="og:title" content="러브핏 — 스토리로 읽는 우리의 궁합" />
 <meta property="og:description" content="어느 연애의 사계절, 12장면의 선택으로 읽는 MBTI 궁합. 링크를 보내면 둘의 케미가 숫자로 나옵니다." />
 <meta property="og:type" content="website" />
-<meta property="og:url" content="https://lovefit-psi.vercel.app" />
-<meta property="og:image" content="https://lovefit-psi.vercel.app/og.png" />
+<meta property="og:url" content="https://lovefit.vercel.app" />
+<meta property="og:image" content="https://lovefit.vercel.app/og.png" />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
 <style>html,body{margin:0;padding:0;background:#FBF6F4}</style>
@@ -250,6 +250,98 @@ const STORY_POOL = [
       ] },
   ],
 ];
+// [문항 확장팩 v2] 슬롯별 3번째 변형 — 축·주효과(±11) 블루프린트는 기존과 동일해 결과가 수렴한다.
+// 행동 나열형이 아닌 상황 판단형으로 설계해 자기 미화(사회적 바람직성) 응답을 억제한다.
+const STORY_EXPANSION = [
+  { scene: "🎤", grad: ["#FFD7E2", "#FF8FB1"], title: "봄 · 2차의 갈림길",
+    text: "분위기 좋았던 저녁 식사가 끝났다.\n\u201C2차 갈까요?\u201D — 당신이 끌리는 그림은?",
+    options: [
+      { label: "북적이는 곳으로! 시끌벅적한 에너지 속에서 더 가까워진다.", eff: { EI: 11 } },
+      { label: "조용한 바 구석 자리. 목소리 낮춰 나누는 깊은 대화.", eff: { EI: -11 } },
+      { label: "오늘은 여기까지. 좋은 여운은 아껴야 오래간다.", eff: { EI: -4 } },
+    ] },
+  { scene: "📸", grad: ["#FFE3C2", "#FFA26B"], title: "봄 · 사진첩을 넘기다",
+    text: "지난 데이트 사진을 함께 본다. 한 장의 사진에서 당신이 먼저 떠올리는 것은—",
+    options: [
+      { label: "그날 먹은 메뉴, 걸었던 길, 날씨 — 장면의 디테일.", eff: { SN: 11 } },
+      { label: "그때의 공기와 감정, 그리고 \u2018다음엔 어디를 가볼까\u2019라는 상상.", eff: { SN: -11 } },
+    ] },
+  { scene: "🌊", grad: ["#D9E8FF", "#8FB3FF"], title: "봄 · \u201C지금 바다 보러 갈래?\u201D",
+    text: "평일 저녁 9시, 상대에게서 갑자기 메시지가 왔다.\n\u201C지금 바다 보러 갈래?\u201D",
+    options: [
+      { label: "좋은데… 내일 일정부터 확인하고 가능 여부를 답한다.", eff: { JP: 11 } },
+      { label: "이미 신발 신는 중. 이런 밤이 추억이 된다.", eff: { JP: -11 } },
+      { label: "가되, 가는 길에 동선과 복귀 시간을 짠다.", eff: { JP: 4 } },
+    ] },
+  { scene: "😢", grad: ["#E4F5EE", "#7EDBB4"], title: "봄 · 영화관의 눈물",
+    text: "영화를 보다 옆자리 상대가 조용히 눈물을 훔친다.",
+    options: [
+      { label: "말없이 손을 잡아준다. 지금은 같이 느끼는 시간.", eff: { TF: -11 } },
+      { label: "끝나고 묻는다. \u201C어떤 장면이 그렇게 와닿았어?\u201D — 이해하고 싶다.", eff: { TF: 11 } },
+    ] },
+  { scene: "📵", grad: ["#FFE9B8", "#F2B441"], title: "여름 · 연락의 온도",
+    text: "바쁜 하루. 당신에게 이상적인 연인과의 연락은—",
+    options: [
+      { label: "실시간 시시콜콜 공유. 점심 메뉴부터 지나가는 강아지까지.", eff: { EI: 11 } },
+      { label: "낮엔 각자 몰입, 밤에 하루를 정리해 몰아서 나누는 통화.", eff: { EI: -11 } },
+    ] },
+  { scene: "🌌", grad: ["#FCE0EE", "#F08BC0"], title: "여름 · 옥상의 밤하늘",
+    text: "한여름 밤, 둘이 옥상에 누워 별을 본다. 먼저 나오는 말은—",
+    options: [
+      { label: "\u201C저건 인공위성이다. 움직이는 속도 보면 알아.\u201D", eff: { SN: 11 } },
+      { label: "\u201C우리가 다른 행성에서 태어났다면 어땠을까?\u201D", eff: { SN: -11 } },
+    ] },
+  { scene: "🎟️", grad: ["#FFD3C2", "#FF8E6E"], title: "여름 · 내가 만든 사고",
+    text: "이번엔 내 실수다 — 예약을 놓쳐 기대하던 데이트가 통째로 꼬였다. 나의 수습 방식은—",
+    options: [
+      { label: "왜 놓쳤는지 원인을 분석하고 재발 방지책까지 세운다.", eff: { TF: 11 } },
+      { label: "방법보다 마음 먼저 — 실망했을 상대의 기분을 푸는 데 집중한다.", eff: { TF: -11 } },
+    ] },
+  { scene: "🎒", grad: ["#D6F2E3", "#5FD9AE"], title: "여름 · 짐 싸는 밤",
+    text: "여행 전날 밤, 캐리어 앞에 선 당신의 모습은—",
+    options: [
+      { label: "체크리스트 앱을 열고 하나씩 지워가며 담는다.", eff: { JP: 11 } },
+      { label: "음악 틀어놓고 감으로 슥슥. 빠진 건 현지의 몫.", eff: { JP: -11 } },
+    ] },
+  { scene: "💌", grad: ["#C9D4E8", "#7A8FBF"], title: "겨울 · 서운함의 전달법",
+    text: "상대에게 서운한 일이 생겼다. 당신이 마음을 전하는 방식은—",
+    options: [
+      { label: "감정이 가라앉은 뒤, 무엇이 왜 서운했는지 조목조목 말한다.", eff: { TF: 11 } },
+      { label: "그 순간의 마음을 그대로 표현한다. 날것이라도 진심이 먼저.", eff: { TF: -11 } },
+      { label: "말로는 엉킬 것 같아 긴 메시지로 정리해 보낸다.", eff: { TF: -4 } },
+    ] },
+  { scene: "🏔️", grad: ["#FFD7E2", "#B78FFF"], title: "겨울 · 여행 로망",
+    text: "커플 겨울 여행, 딱 하나만 고른다면—",
+    options: [
+      { label: "축제가 열리는 도시. 액티비티와 인파의 열기 속으로.", eff: { EI: 11 } },
+      { label: "인적 드문 산속 숙소. 벽난로, 눈, 그리고 우리 둘.", eff: { EI: -11 } },
+    ] },
+  { scene: "🎬", grad: ["#E4D9FF", "#A88BFF"], title: "겨울 · 넷플릭스 앞에서",
+    text: "이불 속 영화 고르기. 리모컨을 쥔 당신의 선택은—",
+    options: [
+      { label: "실화 기반, 개연성 탄탄한 이야기. 현실의 밀도가 좋다.", eff: { SN: 11 } },
+      { label: "세계관이 거대한 SF·판타지. 보고 나서 상상할 거리가 남는 것.", eff: { SN: -11 } },
+    ] },
+  { scene: "⏳", grad: ["#FFE3C2", "#F2B441"], title: "겨울 · 12월 31일의 회고",
+    text: "한 해의 마지막 날, 둘이 올해를 돌아본다. 당신의 회고 스타일은—",
+    options: [
+      { label: "연초 목표 달성률을 정산하고 내년 계획을 세운다.", eff: { JP: 11 } },
+      { label: "계획은 없었지만, 흘러온 대로도 충분히 근사했다.", eff: { JP: -11 } },
+    ] },
+];
+STORY_EXPANSION.forEach((sc, i) => STORY_POOL[i].push(sc));
+// 슬롯 → 측정 축 매핑 (경계선 판정·축별 응답 수 집계용)
+const SLOT_AXIS = ["EI", "SN", "JP", "TF", "EI", "SN", "TF", "JP", "TF", "EI", "SN", "JP"];
+// [Caloz식 적합도] 1개 유형 통보 대신 16유형 전체와의 일치율을 계산해 상위 후보를 공개
+function typeFitRank(scores) {
+  const pct = {};
+  AXES.forEach(ax => { pct[ax.key] = Math.max(5, Math.min(95, 50 + scores[ax.key] * 1.4)); });
+  return Object.keys(TYPES).map(t => {
+    let sum = 0;
+    AXES.forEach((ax, i) => { const p = pct[ax.key]; sum += t[i] === ax.pos ? p : 100 - p; });
+    return { t, fit: Math.round(sum / 4) };
+  }).sort((a, b) => b.fit - a.fit);
+}
 const STAGES = [
   { name: "봄 · 처음의 온도", sub: "설렘 속 선택 4장면", color: C.me, soft: C.meSoft },
   { name: "여름 · 둘만의 계절", sub: "함께하는 시간 4장면", color: C.warmth, soft: C.warmthSoft },
@@ -294,27 +386,124 @@ function copyText(text, done) {
   } else fallback();
 }
 
+// ---------- 효과음 (Web Audio 합성 — 외부 파일·용량 0) ----------
+let _actx = null;
+function sfxEnabled() { try { return localStorage.getItem("lovefit_sfx") !== "off"; } catch (e) { return true; } }
+function sfx(name) {
+  if (!sfxEnabled()) return;
+  try {
+    _actx = _actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (_actx.state === "suspended") _actx.resume();
+    const t = _actx.currentTime;
+    const note = (f, start, dur, type, g) => {
+      const o = _actx.createOscillator(), gn = _actx.createGain();
+      o.type = type || "triangle"; o.frequency.value = f;
+      gn.gain.setValueAtTime(0.0001, t + start);
+      gn.gain.exponentialRampToValueAtTime(g || 0.1, t + start + 0.012);
+      gn.gain.exponentialRampToValueAtTime(0.0001, t + start + dur);
+      o.connect(gn); gn.connect(_actx.destination);
+      o.start(t + start); o.stop(t + start + dur + 0.05);
+    };
+    if (name === "pick") { note(660, 0, 0.12, "triangle", 0.09); note(880, 0.05, 0.12, "triangle", 0.07); }          // 선택 — 통통 튀는 팝
+    else if (name === "skip") { note(340, 0, 0.14, "sine", 0.06); note(260, 0.07, 0.16, "sine", 0.05); }             // 보류 — 낮은 슉
+    else if (name === "stage") { [523, 659, 784].forEach((f, i) => note(f, i * 0.09, 0.2, "triangle", 0.09)); }      // 단계 완료 — 상승 3음
+    else if (name === "result") { [523, 659, 784, 1047].forEach((f, i) => note(f, i * 0.1, 0.24, "triangle", 0.1)); }// 내 유형 공개 — 팡파레
+    else if (name === "love") { [659, 784, 988, 1319, 1568].forEach((f, i) => note(f, i * 0.1, 0.26, "sine", 0.09)); }// 궁합 공개 — 하트 팡파레
+    else if (name === "check") { note(784, 0, 0.1, "sine", 0.09); note(1175, 0.08, 0.18, "sine", 0.09); }            // 미션 완료 — 딩동
+    else if (name === "uncheck") { note(520, 0, 0.1, "sine", 0.05); }                                                // 체크 해제
+  } catch (e) { /* 오디오 미지원 환경은 조용히 통과 */ }
+}
+
+// ---------- 결과 화면 하트 레인 연출 ----------
+function HeartRain({ n = 10 }) {
+  const em = ["💗", "💜", "❤️", "💕", "✨"];
+  return (
+    <div style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden" }}>
+      {Array.from({ length: n }).map((_, i) => (
+        <span key={i} style={{ position: "absolute", left: `${(i * 37 + 7) % 96}%`, top: -26, fontSize: 13 + (i % 3) * 7, opacity: 0.55, animation: `fall ${4.5 + (i % 4)}s linear ${(i * 0.8) % 4}s infinite` }}>{em[i % em.length]}</span>
+      ))}
+    </div>
+  );
+}
+
+// ---------- 점수 카운트업 (0 → 총점, easeOutCubic) ----------
+function CountUp({ to, duration = 1800, style, onDone }) {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    let reduced = false;
+    try { reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
+    if (reduced) { setVal(to); if (onDone) onDone(); return; }
+    let raf; const t0 = performance.now();
+    const tick = now => {
+      const p = Math.min(1, (now - t0) / duration);
+      const e = 1 - Math.pow(1 - p, 3); // easeOutCubic — 막판에 감속하며 긴장감
+      setVal(Math.round(to * e));
+      if (p < 1) raf = requestAnimationFrame(tick);
+      else if (onDone) onDone();
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [to]);
+  return <span style={style}>{val}</span>;
+}
+
+// ---------- 이름 프리셋 (원터치 시작용) ----------
+// [시즌 로테이션 설계] 기본 프리셋 위에 시즌 에디션을 덮어쓰는 2층 구조.
+// 시즌 추가는 NAME_SEASONS에 { 기간 판정, 라벨, m/f 목록 } 한 덩어리만 넣으면 끝 — 코드 수정 불필요.
+// 기간 판정은 기기 로컬 날짜 기준이라 서버 없이 작동하며, 겹치면 배열 앞쪽 시즌이 우선한다.
+const NAME_PRESETS = {
+  m: ["다정한 상남자", "츤데레 곰돌이", "로맨틱 황소", "국가대표 남친", "무심한 척 순정남", "잘생김 주의"],
+  f: ["새침한 여우", "러블리 토끼", "츤데레 고양이", "우아한 백조", "국가대표 여친", "예쁨 주의"],
+};
+const NAME_SEASONS = [
+  { id: "valentine", label: "💝 발렌타인 에디션", // 2/1 ~ 3/14 (화이트데이까지)
+    test: d => (d.getMonth() === 1) || (d.getMonth() === 2 && d.getDate() <= 14),
+    m: ["초콜릿보다 달달남", "심쿵 유발자", "발렌타인 왕자", "고백 준비 완료", "설렘 제조기", "달달함 주의"],
+    f: ["초코 요정", "발렌타인 여신", "심장 저격수", "고백 기다리는 중", "설렘 폭탄", "달콤함 주의"] },
+  { id: "spring", label: "🌸 벚꽃 에디션", // 3/15 ~ 4/30
+    test: d => (d.getMonth() === 2 && d.getDate() >= 15) || d.getMonth() === 3,
+    m: ["벚꽃엔딩 주인공", "봄바람 훈남", "꽃보다 남친", "봄날의 곰", "설레는 산책러", "벚꽃 아래 그 남자"],
+    f: ["벚꽃 요정", "봄바람 여신", "꽃보다 예쁨", "봄날의 햇살", "설레는 산책러", "벚꽃 아래 그 여자"] },
+  { id: "summer", label: "🏖️ 바캉스 에디션", // 7 ~ 8월
+    test: d => d.getMonth() === 6 || d.getMonth() === 7,
+    m: ["바캉스 상남자", "서핑보드 훈남", "여름밤 불꽃남", "수박 반 통 내 것", "태닝한 곰돌이", "시원함 주의"],
+    f: ["해변의 인어", "바캉스 여신", "여름밤 불꽃녀", "수박 반 통 내 것", "선글라스 여우", "청량함 주의"] },
+  { id: "christmas", label: "🎄 크리스마스 에디션", // 12월
+    test: d => d.getMonth() === 11,
+    m: ["산타보다 다정남", "루돌프 훈남", "크리스마스의 기적", "트리 밑 선물남", "겨울왕국 왕자", "포근함 주의"],
+    f: ["산타걸", "겨울 요정", "크리스마스의 기적", "트리보다 반짝", "겨울왕국 여왕", "포근함 주의"] },
+];
+function activeNamePreset(now) {
+  const d = now || new Date();
+  const s = NAME_SEASONS.find(se => { try { return se.test(d); } catch (e) { return false; } });
+  return s ? { label: s.label, m: s.m, f: s.f } : { label: null, m: NAME_PRESETS.m, f: NAME_PRESETS.f };
+}
+
 // ---------- 궁합 계산 ----------
 function axisRel(a, b, key) { return a[key] === b[key] ? "same" : "diff"; }
-function coupleReport(tA, tB) {
+function coupleReport(tA, tB, sA, sB) {
   const A = { EI: tA[0], SN: tA[1], TF: tA[2], JP: tA[3] };
   const B = { EI: tB[0], SN: tB[1], TF: tB[2], JP: tB[3] };
+  // ⚖️ 경계선 판정: 한쪽이라도 해당 축 점수가 균형 구간(|score|<6)이면 '다름'의 감점을 완화한다.
+  // 경계선인 사람은 실제로 양쪽 성향을 오가므로, 글자만 보고 정반대로 취급하는 것은 과잉 감점이다.
+  const bline = key => (sA && Math.abs(sA[key] || 0) < 6) || (sB && Math.abs(sB[key] || 0) < 6);
+  const BD_NOTE = " ⚖️ 두 사람 중 한쪽은 이 축이 경계선(균형형)이라 상황에 따라 같은 결로 움직이는 날이 많습니다 — 차이 감점을 완화해 반영했어요.";
   const cats = [];
   // 대화·세계관 (S/N) — 궁합의 뼈대
   if (axisRel(A, B, "SN") === "same") {
     cats.push({ icon: "🗣️", name: "대화 케미", score: 24, max: 25,
       text: A.SN === "N" ? "둘 다 상상파(N). \u201C만약에\u201D 하나로 새벽까지 대화가 이어지는 조합입니다." : "둘 다 현실파(S). 말이 겉돌지 않고, 계획과 실행의 합이 잘 맞습니다." });
   } else {
-    cats.push({ icon: "🗣️", name: "대화 케미", score: 14, max: 25,
-      text: "현실(S)과 상상(N)의 만남. 대화의 초점이 어긋날 때가 있지만, 서로의 시선이 못 보던 세계를 열어줍니다. \u2018다른 게 아니라 새로운 것\u2019이라고 번역하는 게 핵심." });
+    cats.push({ icon: "🗣️", name: "대화 케미", score: bline("SN") ? 19 : 14, max: 25,
+      text: "현실(S)과 상상(N)의 만남. 대화의 초점이 어긋날 때가 있지만, 서로의 시선이 못 보던 세계를 열어줍니다. \u2018다른 게 아니라 새로운 것\u2019이라고 번역하는 게 핵심." + (bline("SN") ? BD_NOTE : "") });
   }
   // 마음 표현·갈등 (T/F)
   if (axisRel(A, B, "TF") === "same") {
     cats.push({ icon: "🕊️", name: "갈등 해결", score: 22, max: 25,
       text: A.TF === "F" ? "둘 다 감성파(F). 서운함을 마음으로 먼저 풀어주는 다정한 화해가 가능합니다. 단, 둘 다 상처를 오래 품는 편이니 표현은 빠르게." : "둘 다 이성파(T). 감정 소모 없이 문제 자체로 직진하는 깔끔한 화해. 가끔은 \u2018맞고 틀림\u2019 대신 \u2018고맙고 미안함\u2019도 챙기세요." });
   } else {
-    cats.push({ icon: "🕊️", name: "갈등 해결", score: 15, max: 25,
-      text: "이성(T)과 감성(F)의 만남 — 다툼의 단골 코스이자, 잘 맞추면 최강의 균형. F에게는 \u2018공감 먼저 해결 나중\u2019, T에게는 \u2018지적이 아니라 관심\u2019이라는 번역기가 필요합니다." });
+    cats.push({ icon: "🕊️", name: "갈등 해결", score: bline("TF") ? 19 : 15, max: 25,
+      text: "이성(T)과 감성(F)의 만남 — 다툼의 단골 코스이자, 잘 맞추면 최강의 균형. F에게는 \u2018공감 먼저 해결 나중\u2019, T에게는 \u2018지적이 아니라 관심\u2019이라는 번역기가 필요합니다." + (bline("TF") ? BD_NOTE : "") });
   }
   // 에너지·데이트 (E/I)
   if (axisRel(A, B, "EI") === "diff") {
@@ -332,9 +521,10 @@ function coupleReport(tA, tB) {
     cats.push({ icon: "🧭", name: "라이프스타일", score: A.JP === "J" ? 21 : 19, max: 25,
       text: A.JP === "J" ? "둘 다 계획파(J). 여행 엑셀이 두 개 만들어지는 커플. 일정 충돌만 조율하면 인생 설계까지 함께 굴러갑니다." : "둘 다 즉흥파(P). \u201C지금 갈까?\u201D 한 마디면 출발하는 자유로운 커플. 예약과 마감만 서로 챙겨주면 완벽합니다." });
   } else {
-    cats.push({ icon: "🧭", name: "라이프스타일", score: 15, max: 25,
-      text: "계획(J)과 즉흥(P)의 만남. 준비하는 사람과 유연한 사람의 분업이 이뤄지면 최강의 여행 파트너 — 다만 \u2018왜 계획 안 해\u2019와 \u2018왜 숨 막히게 해\u2019 사이의 번역이 숙제입니다." });
+    cats.push({ icon: "🧭", name: "라이프스타일", score: bline("JP") ? 18 : 15, max: 25,
+      text: "계획(J)과 즉흥(P)의 만남. 준비하는 사람과 유연한 사람의 분업이 이뤄지면 최강의 여행 파트너 — 다만 \u2018왜 계획 안 해\u2019와 \u2018왜 숨 막히게 해\u2019 사이의 번역이 숙제입니다." + (bline("JP") ? BD_NOTE : "") });
   }
+  const bAxes = AXES.filter(ax => bline(ax.key)).map(ax => `${ax.neg}/${ax.pos}`);
   const golden = isGolden(tA, tB);
   let total = cats.reduce((s, c) => s + c.score, 0) + 3 + (golden ? 6 : 0);
   total = Math.max(50, Math.min(99, total));
@@ -412,10 +602,15 @@ function coupleReport(tA, tB) {
       body: "두 유형은 성격 이론에서 서로의 부족한 기능을 자연스럽게 메워주는 보완 관계로 자주 언급되는 조합입니다. 다만 \u2018천생연분\u2019은 자동 완성이 아니라 잠재력의 이름입니다 — 보완 관계는 존중이 있을 때 시너지가 되고, 존중이 없을 때 가장 신랄한 비난의 재료가 됩니다. 서로의 다른 점을 \u2018고칠 것\u2019이 아니라 \u2018빌려 쓸 것\u2019으로 대하는 순간 이 조합의 진가가 나옵니다.",
       action: null });
   }
+  if (bAxes.length) {
+    tips.push({ tag: "특별 처방", title: `⚖️ 경계선 축 ${bAxes.length}개(${bAxes.join(", ")}) — 두 세계를 오가는 통역사`,
+      body: "두 사람 중 한쪽(혹은 둘 다)은 이 축에서 어느 한쪽으로 치우치지 않은 균형형입니다. 균형형은 \u2018성향이 흐릿한 것\u2019이 아니라 상대의 언어를 양쪽 다 구사할 수 있다는 뜻이라, 커플 사이에서는 갈등의 통역사 역할을 할 수 있는 귀한 포지션입니다. 다만 균형형 본인은 그날의 컨디션에 따라 반응이 달라져 상대가 \u201C저번엔 안 그랬잖아\u201D라고 느낄 수 있으니, \u2018나 오늘은 이쪽 모드야\u2019라고 가볍게 알려주는 습관이 서로를 편하게 합니다.",
+      action: "균형형인 사람이 오늘의 모드(예: \u201C오늘은 집콕 모드\u201D, \u201C오늘은 계획 모드\u201D)를 데이트 시작 때 한 마디로 선언해보기." });
+  }
   tips.push({ tag: "마무리", title: "이 리포트를 쓰는 법",
     body: "검사 결과는 판정이 아니라 대화의 출발점입니다. 점수 자체보다, 각 항목을 함께 읽으며 \u201C이거 진짜 우리 얘기다\u201D와 \u201C이건 좀 아닌데?\u201D를 나누는 시간이 진짜 궁합을 만듭니다. 특히 \u2018아닌데?\u2019가 나온 항목이야말로 서로를 새로 알게 되는 가장 좋은 입구입니다.",
     action: "리포트를 같이 보며 가장 공감된 항목 1개, 가장 동의 안 되는 항목 1개를 서로 골라 이유 말해보기." });
-  return { cats, total, golden, tips };
+  return { cats, total, golden, tips, bAxes };
 }
 function totalLabel(t) {
   if (t >= 92) return { g: "S", word: "운명의 상성", desc: "이론상 천생연분 구간" };
@@ -468,7 +663,7 @@ function PrescriptionList({ tips, coupleKey }) {
   });
   const toggle = i => {
     const nd = { ...done, [i]: !done[i] };
-    setDone(nd);
+    setDone(nd); sfx(nd[i] ? "check" : "uncheck");
     try { localStorage.setItem(storeKey, JSON.stringify(nd)); } catch (e) { /* 저장 불가 환경은 세션 내 상태만 유지 */ }
   };
   const actionable = tips.map((t, i) => ({ t, i })).filter(x => x.t.action);
@@ -565,7 +760,10 @@ function LoveFit() {
   const [sceneMs, setSceneMs] = useState(Array(12).fill(null));
   const [qStart, setQStart] = useState(Date.now());
   const [seed, setSeed] = useState(() => Math.floor(Math.random() * 100000));
+  const [bonus, setBonus] = useState(null); // 적응형 보완 문항 { list, idx, answers } — 유효 응답 부족 축 즉석 보강
   const [copied, setCopied] = useState("");
+  const [sfxOn, setSfxOn] = useState(() => sfxEnabled());
+  const [customName, setCustomName] = useState(false);
 
   useEffect(() => {
     const h = location.hash;
@@ -588,11 +786,16 @@ function LoveFit() {
     const s = { EI: 0, SN: 0, TF: 0, JP: 0 };
     activeStory.forEach((sc, i) => {
       const a = answers[i];
+      if (a == null || a === "skip") return;
+      Object.entries(sc.options[a].eff).forEach(([k, v]) => { s[k] += v; });
+    });
+    if (bonus) bonus.list.forEach((sc, i) => {
+      const a = bonus.answers[i];
       if (a == null) return;
       Object.entries(sc.options[a].eff).forEach(([k, v]) => { s[k] += v; });
     });
     return s;
-  }, [answers, activeStory]);
+  }, [answers, activeStory, bonus]);
   const myType = lettersOf(scores);
   const allDone = answers.every(a => a != null);
 
@@ -606,15 +809,29 @@ function LoveFit() {
     const flags = [];
     if (maxSame >= 10) flags.push("같은 위치 반복");
     if (median < 1400) flags.push("응답 속도 과다");
+    const skips = answers.filter(a => a === "skip").length;
+    if (skips >= 4) flags.push(`판단 보류 ${skips}회`);
     return { level: flags.length === 0 ? "높음" : flags.length === 1 ? "보통" : "확인 필요", flags };
-  }, [allDone, posLog, sceneMs]);
+  }, [allDone, posLog, sceneMs, answers]);
+
+  // 축별 메타: 유효 응답 수 + 경계선(균형형) 여부 — 49% vs 51% 강제 분류의 완충 장치
+  const axisMeta = useMemo(() => {
+    const m = {};
+    AXES.forEach(ax => {
+      const slots = SLOT_AXIS.map((k, i) => (k === ax.key ? i : -1)).filter(i => i >= 0);
+      const effective = slots.filter(i => answers[i] != null && answers[i] !== "skip").length;
+      const bonusEff = bonus ? bonus.list.filter((sc, i) => sc._axis === ax.key && bonus.answers[i] != null).length : 0;
+      m[ax.key] = { effective: effective + bonusEff, borderline: Math.abs(scores[ax.key]) < 6 };
+    });
+    return m;
+  }, [answers, scores, bonus]);
 
   const resetTest = () => {
     setStage(0); setPhase("quiz"); setQIdx(0);
     setAnswers(Array(12).fill(null)); setPosLog(Array(12).fill(null)); setSceneMs(Array(12).fill(null));
-    setSeed(Math.floor(Math.random() * 100000)); setQStart(Date.now());
+    setSeed(Math.floor(Math.random() * 100000)); setQStart(Date.now()); setBonus(null);
   };
-  const startTest = () => { resetTest(); setMode("name"); setNameDraft(""); };
+  const startTest = () => { resetTest(); setMode("name"); setNameDraft(""); setCustomName(false); };
 
   const shell = { minHeight: "100vh", background: C.bg, fontFamily: font, color: C.ink, display: "flex", flexDirection: "column", alignItems: "center" };
   const card = { background: C.paper, border: `1px solid ${C.line}`, borderRadius: 18, padding: 20 };
@@ -627,7 +844,9 @@ function LoveFit() {
     @keyframes pulseGlow { 0%,100%{box-shadow:0 0 0 0 rgba(232,68,122,.55)} 50%{box-shadow:0 0 0 14px rgba(232,68,122,0)} }
     @keyframes wobble { 0%,100%{transform:rotate(-4deg)} 50%{transform:rotate(4deg)} }
     @keyframes beat { 0%,100%{transform:scale(1)} 12%{transform:scale(1.18)} 24%{transform:scale(1)} 36%{transform:scale(1.12)} 48%{transform:scale(1)} }
-    .pop{animation:popIn .45s ease both} .pop2{animation:popIn .45s .12s ease both} .pop3{animation:popIn .45s .24s ease both}
+    @keyframes fall { 0%{transform:translateY(0) rotate(0deg)} 80%{opacity:.55} 100%{transform:translateY(460px) rotate(50deg); opacity:0} }
+    button:active { transform: scale(.97); }
+    .pop{animation:popIn .45s ease both} .pop2{animation:popIn .45s .12s ease both} .pop3{animation:popIn .45s .24s ease both} .reveal-late{animation:popIn .5s 1.75s ease both}
     .glow{animation:pulseGlow 2.2s infinite} .wob{animation:wobble 2.4s ease-in-out infinite} .beat{animation:beat 1.6s ease-in-out infinite}
     @media (prefers-reduced-motion: reduce){ *{animation:none !important} }
   `;
@@ -640,15 +859,19 @@ function LoveFit() {
         </span>
         <span style={{ fontSize: 12, color: C.sub, fontWeight: 700 }}>스토리로 읽는 우리의 궁합</span>
       </div>
-      {mode !== "home" && (
-        <button onClick={() => { location.hash = ""; setMode("home"); }} style={{ background: "transparent", border: `1px solid ${C.line}`, borderRadius: 10, padding: "7px 14px", fontSize: 13, fontWeight: 700, color: C.sub, cursor: "pointer", fontFamily: font }}>처음으로</button>
-      )}
+      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <button onClick={() => { const on = !sfxOn; setSfxOn(on); try { localStorage.setItem("lovefit_sfx", on ? "on" : "off"); } catch (e) {} if (on) sfx("pick"); }} title="효과음 켜기/끄기"
+          style={{ background: "transparent", border: `1px solid ${C.line}`, borderRadius: 10, padding: "6px 10px", fontSize: 14, cursor: "pointer" }}>{sfxOn ? "🔊" : "🔇"}</button>
+        {mode !== "home" && (
+          <button onClick={() => { location.hash = ""; setMode("home"); }} style={{ background: "transparent", border: `1px solid ${C.line}`, borderRadius: 10, padding: "7px 14px", fontSize: 13, fontWeight: 700, color: C.sub, cursor: "pointer", fontFamily: font }}>처음으로</button>
+        )}
+      </div>
     </div>
   );
 
   const copyBtn = (key, text, label, bg) => (
     <button className={key === "invite" ? "glow" : ""} style={{ ...btn(bg || C.me), fontSize: 15 }}
-      onClick={() => copyText(text, ok => { setCopied(ok ? key : "fail"); setTimeout(() => setCopied(""), 2200); })}>
+      onClick={() => copyText(text, ok => { if (ok) sfx("check"); setCopied(ok ? key : "fail"); setTimeout(() => setCopied(""), 2200); })}>
       {copied === key ? "복사 완료! 이제 붙여넣기만 하세요 ✓" : label}
     </button>
   );
@@ -724,8 +947,9 @@ function LoveFit() {
           <div style={{ ...card, marginTop: 12, display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
             <span style={{ fontSize: 30 }}>🔁</span>
             <div style={{ fontSize: 12.5, color: C.sub, lineHeight: 1.7, flex: "1 1 300px" }}>
-              장면은 접속할 때마다 로테이션되지만, 각 장면이 <b style={{ color: C.ink }}>측정하는 축과 크기는 고정</b>되어 있어
-              다시 검사해도 결과가 거의 같게 나오도록 설계했습니다. 커플이 서로 다른 문항을 받아도 공정한 이유입니다.
+              <b style={{ color: C.ink }}>36장면 뱅크</b>에서 매번 12장면이 로테이션되지만, 각 장면이 <b style={{ color: C.ink }}>측정하는 축과 크기는 고정</b>되어 있어
+              다시 검사해도 결과가 거의 같게 나오도록 설계했습니다. 어떤 장면도 내 이야기가 아니면 <b style={{ color: C.ink }}>판단 보류</b>할 수 있고,
+              보류한 장면은 점수에서 제외됩니다 — 억지 응답이 결과를 오염시키지 않는 이유입니다.
             </div>
           </div>
         </div>
@@ -733,28 +957,56 @@ function LoveFit() {
     );
   }
 
-  // ================= 이름 입력 =================
+  // ================= 주인공 선택 =================
   if (mode === "name") {
+    const preset = activeNamePreset();
+    const pickName = n => { sfx("pick"); setMyName(n); setMode("quiz"); setPhase("quiz"); setQStart(Date.now()); };
+    const nameChip = n => (
+      <button key={n} onClick={() => pickName(n)} style={{ padding: "11px 15px", borderRadius: 999, cursor: "pointer", fontFamily: font, fontSize: 13.5, fontWeight: 700, border: `1.5px solid ${C.line}`, background: C.paper, color: C.ink }}>
+        {n}
+      </button>
+    );
     return (
       <div style={shell}>
         <style>{css}</style>
         {Header}
-        <div style={{ width: "100%", maxWidth: 480, padding: "40px 20px 60px" }}>
-          <div className="pop" style={{ ...card, textAlign: "center", padding: "36px 26px" }}>
-            <div className="beat" style={{ fontSize: 56, display: "inline-block" }}>💌</div>
-            <div style={{ fontSize: 20, fontWeight: 900, margin: "12px 0 6px" }}>
-              {invite ? `${invite.n}님이 기다리고 있어요` : "이야기의 주인공 이름은?"}
+        <div style={{ width: "100%", maxWidth: 520, padding: "34px 20px 60px" }}>
+          <div className="pop" style={{ ...card, textAlign: "center", padding: "32px 24px" }}>
+            <div className="beat" style={{ fontSize: 52, display: "inline-block" }}>💌</div>
+            <div style={{ fontSize: 20, fontWeight: 900, margin: "10px 0 4px" }}>
+              {invite ? `${invite.n}님이 기다리고 있어요` : "이야기의 주인공을 골라주세요"}
             </div>
-            <p style={{ fontSize: 13, color: C.sub, lineHeight: 1.7, margin: "0 0 18px" }}>
-              결과 카드와 궁합 리포트에 표시될 이름(닉네임)을 알려주세요.
+            {preset.label && (
+              <div style={{ marginBottom: 8 }}>
+                <Chip bg={C.meSoft} color={C.me}>{preset.label} · 지금만 만날 수 있는 닉네임</Chip>
+              </div>
+            )}
+            <p style={{ fontSize: 12.5, color: C.sub, lineHeight: 1.7, margin: "0 0 18px" }}>
+              닉네임을 탭하면 <b style={{ color: C.me }}>바로 이야기가 시작</b>돼요. 결과 카드와 궁합 리포트에 이 이름이 표시됩니다.
             </p>
-            <input value={nameDraft} onChange={e => setNameDraft(e.target.value)} maxLength={10} placeholder="예) 시철, 자기야, 곰돌이"
-              onKeyDown={e => { if (e.key === "Enter" && nameDraft.trim()) { setMyName(nameDraft.trim()); setMode("quiz"); setPhase("quiz"); setQStart(Date.now()); } }}
-              style={{ width: "100%", boxSizing: "border-box", padding: "14px 16px", borderRadius: 13, border: `1.5px solid ${C.line}`, fontSize: 16, fontWeight: 700, fontFamily: font, outline: "none", textAlign: "center", marginBottom: 16 }} />
-            <button disabled={!nameDraft.trim()} style={{ ...btn(C.me), width: "100%", opacity: nameDraft.trim() ? 1 : 0.4 }}
-              onClick={() => { setMyName(nameDraft.trim()); setMode("quiz"); setPhase("quiz"); setQStart(Date.now()); }}>
-              1부 · 봄의 이야기 시작 →
-            </button>
+            <div style={{ fontSize: 12.5, fontWeight: 900, color: C.you, marginBottom: 8 }}>💙 남자 주인공</div>
+            <div style={{ display: "flex", gap: 7, flexWrap: "wrap", justifyContent: "center", marginBottom: 16 }}>
+              {preset.m.map(nameChip)}
+            </div>
+            <div style={{ fontSize: 12.5, fontWeight: 900, color: C.me, marginBottom: 8 }}>💗 여자 주인공</div>
+            <div style={{ display: "flex", gap: 7, flexWrap: "wrap", justifyContent: "center", marginBottom: 18 }}>
+              {preset.f.map(nameChip)}
+            </div>
+            {!customName ? (
+              <button onClick={() => setCustomName(true)} style={{ background: "transparent", border: `1.5px dashed #DFC9CF`, borderRadius: 12, padding: "10px 18px", fontSize: 12.5, fontWeight: 700, color: "#AD939C", cursor: "pointer", fontFamily: font }}>
+                ✍️ 내 이름(닉네임)으로 할래요
+              </button>
+            ) : (
+              <div className="pop">
+                <input value={nameDraft} onChange={e => setNameDraft(e.target.value)} maxLength={10} placeholder="예) 시철, 자기야, 곰돌이" autoFocus
+                  onKeyDown={e => { if (e.key === "Enter" && nameDraft.trim()) pickName(nameDraft.trim()); }}
+                  style={{ width: "100%", boxSizing: "border-box", padding: "13px 16px", borderRadius: 13, border: `1.5px solid ${C.me}66`, fontSize: 15.5, fontWeight: 700, fontFamily: font, outline: "none", textAlign: "center", marginBottom: 12 }} />
+                <button disabled={!nameDraft.trim()} style={{ ...btn(C.me), width: "100%", opacity: nameDraft.trim() ? 1 : 0.4 }}
+                  onClick={() => nameDraft.trim() && pickName(nameDraft.trim())}>
+                  이 이름으로 시작 →
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -766,6 +1018,49 @@ function LoveFit() {
     const st = STAGES[stage];
     const items = activeStory.slice(stage * 4, stage * 4 + 4);
     const stageAnswered = items.filter((_, i) => answers[stage * 4 + i] != null).length;
+
+    if (phase === "bonus" && bonus) {
+      const bq = bonus.list[bonus.idx];
+      const ax = AXES.find(a => a.key === bq._axis);
+      return (
+        <div style={shell}>
+          <style>{css}</style>
+          {Header}
+          <div style={{ width: "100%", maxWidth: 600, padding: "14px 20px 60px" }}>
+            <div className="pop" style={{ ...card, borderTop: `4px solid ${C.you}` }} key={`bonus-${bonus.idx}`}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, flexWrap: "wrap", gap: 6 }}>
+                <Chip bg={C.youSoft} color={C.you}>🔬 정밀 보완 장면 · {ax.negName}/{ax.posName} 축</Chip>
+                <span style={{ fontSize: 12, fontWeight: 700, color: C.sub }}>보완 {bonus.idx + 1} / {bonus.list.length}</span>
+              </div>
+              <div style={{ fontSize: 12, color: C.sub, lineHeight: 1.7, background: C.youSoft, borderRadius: 10, padding: "9px 12px", marginBottom: 12 }}>
+                판단 보류가 겹쳐 <b style={{ color: C.you }}>{ax.negName}({ax.neg})/{ax.posName}({ax.pos}) 축</b>의 데이터가 부족해요.
+                정확한 결과를 위해 새 장면 {bonus.list.length}개만 더 볼게요 — 이번엔 조금 더 끌리는 쪽을 골라주세요.
+              </div>
+              <div style={{ margin: "2px 0 12px" }}>
+                <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", padding: "30px 0", textAlign: "center", background: `linear-gradient(135deg, ${bq.grad[0]}, ${bq.grad[1]})` }}>
+                  <div style={{ position: "absolute", left: -34, top: -34, width: 150, height: 150, borderRadius: "50%", background: "rgba(255,255,255,.24)" }} />
+                  <div className="wob" style={{ fontSize: 82, lineHeight: 1, position: "relative", display: "inline-block", filter: "drop-shadow(0 6px 12px rgba(0,0,0,.16))" }}>{bq.scene}</div>
+                </div>
+                <div style={{ fontSize: 13.5, fontWeight: 800, color: C.you, marginTop: 10, textAlign: "center" }}>{bq.title}</div>
+              </div>
+              <div style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.75, marginBottom: 18, whiteSpace: "pre-line" }}>{bq.text}</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {bq.options.map((op, oi) => (
+                  <button key={op.label} onClick={() => {
+                    sfx("pick"); const na = [...bonus.answers]; na[bonus.idx] = oi;
+                    if (bonus.idx < bonus.list.length - 1) { setBonus({ ...bonus, answers: na, idx: bonus.idx + 1 }); setQStart(Date.now()); }
+                    else { setBonus({ ...bonus, answers: na }); markSeen(activeStory); sfx(invite ? "love" : "result"); setTimeout(() => setMode("result"), 200); }
+                  }} style={{ textAlign: "left", padding: "13px 16px", borderRadius: 13, cursor: "pointer", fontFamily: font, fontSize: 14.5, lineHeight: 1.55, fontWeight: 600, border: `1.5px solid ${C.line}`, background: C.paper, color: C.ink }}>
+                    {op.label}
+                  </button>
+                ))}
+                <div style={{ fontSize: 10.5, color: "#C4AEB6", textAlign: "center" }}>보완 장면은 정확도를 위한 추가 측정이라 판단 보류 없이 진행돼요.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
 
     if (phase === "rest") {
       const next = STAGES[stage + 1];
@@ -803,11 +1098,29 @@ function LoveFit() {
 
     const qu = items[qIdx];
     const gIdx = stage * 4 + qIdx;
-    const advance = () => {
+    const advance = (ansNow) => {
       setQStart(Date.now());
-      if (qIdx < 3) setQIdx(qIdx + 1);
-      else if (stage < 2) setPhase("rest");
-      else { markSeen(activeStory); setMode("result"); }
+      if (qIdx < 3) { setQIdx(qIdx + 1); return; }
+      if (stage < 2) { sfx("stage"); setPhase("rest"); return; }
+      // [적응형 보완] 12장면 종료 — 판단 보류가 몰려 유효 응답 ≤1인 축은 안 본 변형에서 최대 2장면 즉석 출제
+      const ans = ansNow || answers;
+      const weak = AXES.map(a => a.key).filter(k => {
+        const slots = SLOT_AXIS.map((sk, si) => (sk === k ? si : -1)).filter(si => si >= 0);
+        return slots.filter(si => ans[si] != null && ans[si] !== "skip").length <= 1;
+      });
+      if (weak.length && !bonus) {
+        const list = [];
+        weak.forEach(k => {
+          SLOT_AXIS.forEach((sk, si) => {
+            if (sk !== k) return;
+            STORY_POOL[si].forEach((v, vi) => {
+              if (vi !== activeStory[si]._v && list.filter(x => x._axis === k).length < 2) list.push({ ...v, _axis: k });
+            });
+          });
+        });
+        if (list.length) { sfx("stage"); setBonus({ list, idx: 0, answers: Array(list.length).fill(null) }); setPhase("bonus"); return; }
+      }
+      markSeen(activeStory); sfx(invite ? "love" : "result"); setMode("result");
     };
     return (
       <div style={shell}>
@@ -850,15 +1163,24 @@ function LoveFit() {
                 const on = answers[gIdx] === origIdx;
                 return (
                   <button key={op.label} onClick={() => {
-                    const na = [...answers]; na[gIdx] = origIdx; setAnswers(na);
+                    sfx("pick"); const na = [...answers]; na[gIdx] = origIdx; setAnswers(na);
                     const np = [...posLog]; np[gIdx] = di; setPosLog(np);
                     const nt = [...sceneMs]; nt[gIdx] = Date.now() - qStart; setSceneMs(nt);
-                    setTimeout(advance, 200);
+                    setTimeout(() => advance(na), 200);
                   }} style={{ textAlign: "left", padding: "13px 16px", borderRadius: 13, cursor: "pointer", fontFamily: font, fontSize: 14.5, lineHeight: 1.55, fontWeight: on ? 800 : 600, border: `1.5px solid ${on ? st.color : C.line}`, background: on ? st.soft : C.paper, color: on ? st.color : C.ink }}>
                     {op.label}
                   </button>
                 );
               })}
+              <button onClick={() => {
+                sfx("skip"); const na = [...answers]; na[gIdx] = "skip"; setAnswers(na);
+                const np = [...posLog]; np[gIdx] = null; setPosLog(np);
+                const nt = [...sceneMs]; nt[gIdx] = Date.now() - qStart; setSceneMs(nt);
+                setTimeout(() => advance(na), 200);
+              }} style={{ textAlign: "center", padding: "10px 16px", borderRadius: 12, cursor: "pointer", fontFamily: font, fontSize: 12.5, fontWeight: 700, border: `1.5px dashed ${answers[gIdx] === "skip" ? st.color : "#DFC9CF"}`, background: answers[gIdx] === "skip" ? st.soft : "transparent", color: answers[gIdx] === "skip" ? st.color : "#AD939C" }}>
+                🤔 둘 다 내 이야기가 아니에요 — 이 장면은 판단 보류
+              </button>
+              <div style={{ fontSize: 10.5, color: "#C4AEB6", textAlign: "center" }}>억지로 고르면 오히려 결과가 흐려져요. 보류한 장면은 점수에 반영하지 않습니다.</div>
             </div>
           </div>
           <div style={{ display: "flex", justifyContent: "flex-start", marginTop: 14 }}>
@@ -875,6 +1197,7 @@ function LoveFit() {
 
   if (mode === "result" && !invite) {
     const T = TYPES[myType];
+    const fitRank = typeFitRank(scores);
     const inviteLink = `${baseUrl()}#invite=${enc(mePayload)}`;
     const shareMsg = `💘 러브핏 궁합 테스트\n\n나(${myName})의 연애 유형이 나왔어!\n너도 90초 스토리 테스트하면 우리 궁합이 바로 나와 👇\n${inviteLink}`;
     return (
@@ -884,6 +1207,7 @@ function LoveFit() {
         <div style={{ width: "100%", maxWidth: 780, padding: "14px 20px 60px" }}>
           <div className="pop" style={{ borderRadius: 22, padding: "30px 26px", color: "#fff", marginBottom: 14, position: "relative", overflow: "hidden", background: "linear-gradient(135deg, #1C0F1E, #33152B)" }}>
             <div style={{ position: "absolute", right: -50, top: -50, width: 260, height: 260, borderRadius: "50%", background: "radial-gradient(circle, rgba(232,68,122,.45), transparent 65%)" }} />
+            <HeartRain n={8} />
             <div style={{ position: "relative", display: "flex", gap: 22, flexWrap: "wrap", alignItems: "center" }}>
               <div className="beat" style={{ fontSize: 92, lineHeight: 1 }}>{T.emoji}</div>
               <div style={{ flex: "1 1 280px" }}>
@@ -894,8 +1218,13 @@ function LoveFit() {
                 <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
                   {AXES.map(ax => {
                     const v = scores[ax.key];
-                    return <Chip key={ax.key} bg="rgba(255,255,255,.14)" color="#FFE0EC">{v >= 0 ? ax.pos : ax.neg} · {v >= 0 ? ax.posName : ax.negName} {strengthPct(v)}%</Chip>;
+                    const bd = axisMeta[ax.key] && axisMeta[ax.key].borderline;
+                    return <Chip key={ax.key} bg={bd ? "rgba(242,180,65,.25)" : "rgba(255,255,255,.14)"} color={bd ? "#FFE0A8" : "#FFE0EC"}>{v >= 0 ? ax.pos : ax.neg} · {v >= 0 ? ax.posName : ax.negName} {bd ? "⚖️ 경계선" : `${strengthPct(v)}%`}</Chip>;
                   })}
+                </div>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+                  <Chip bg="rgba(255,255,255,.14)" color="#FFE0EC">유형 일치율 1위 {fitRank[0].t} {fitRank[0].fit}%</Chip>
+                  <Chip bg="rgba(255,255,255,.1)" color="#D9C6D6">2순위 후보 {TYPES[fitRank[1].t].emoji} {fitRank[1].t} {fitRank[1].fit}%</Chip>
                 </div>
                 <Chip bg="rgba(108,92,232,.3)" color="#CFC6FF">💜 이론상 찰떡 · {T.best.map(b => `${TYPES[b].emoji}${b}`).join("  ")}</Chip>
                 {reliability && (
@@ -924,6 +1253,23 @@ function LoveFit() {
           <div className="pop3" style={{ ...card }}>
             <div style={{ fontSize: 12.5, fontWeight: 800, color: C.you, marginBottom: 12 }}>나의 4축 상세</div>
             {AXES.map(ax => <AxisCompare key={ax.key} axis={ax} a={scores[ax.key]} b={null} nameA={myName} nameB="" />)}
+            {AXES.some(ax => axisMeta[ax.key].borderline) && (
+              <div style={{ fontSize: 12, color: C.sub, lineHeight: 1.7, background: "#FFF6E4", borderRadius: 10, padding: "10px 12px", marginBottom: 12 }}>
+                ⚖️ <b>경계선 축 안내</b> — {AXES.filter(ax => axisMeta[ax.key].borderline).map(ax => `${ax.neg}/${ax.pos}`).join(", ")} 축은 양쪽 성향이 거의 균형이에요. 이런 축은 상황에 따라 다르게 발현되는 게 자연스러우며, 강제로 한쪽으로 분류하지 않고 아래 유형 일치율로 함께 보여드립니다.
+              </div>
+            )}
+            <div style={{ fontSize: 12.5, fontWeight: 800, color: C.me, margin: "4px 0 10px" }}>16유형 일치율 TOP 3 <span style={{ fontWeight: 700, color: C.sub, fontSize: 11.5 }}>· 하나로 단정하지 않고 후보의 일치율을 공개합니다</span></div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
+              {fitRank.slice(0, 3).map((r, i) => (
+                <div key={r.t} style={{ display: "grid", gridTemplateColumns: "150px 1fr 44px", alignItems: "center", gap: 10 }}>
+                  <div style={{ fontSize: 13, fontWeight: i === 0 ? 900 : 700, color: i === 0 ? C.ink : C.sub }}>{TYPES[r.t].emoji} {r.t} <span style={{ fontSize: 10.5 }}>{TYPES[r.t].name}</span></div>
+                  <div style={{ height: 9, background: "#F7EEF0", borderRadius: 99, overflow: "hidden" }}>
+                    <div style={{ width: `${r.fit}%`, height: "100%", background: i === 0 ? `linear-gradient(90deg, ${C.me}, ${C.you})` : "#DCC9D0", borderRadius: 99 }} />
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 900, color: i === 0 ? C.me : C.sub, textAlign: "right" }}>{r.fit}%</div>
+                </div>
+              ))}
+            </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 4 }}>
               <button onClick={() => { resetTest(); setMode("quiz"); }} style={{ ...btn("transparent", C.sub), border: `1px solid ${C.line}`, padding: "8px 16px", fontSize: 12.5 }}>다른 장면으로 다시 검사</button>
             </div>
@@ -937,7 +1283,7 @@ function LoveFit() {
   if (mode === "result" && invite || mode === "couple") {
     const A = mode === "couple" ? coupleView.a : invite;         // 초대한 사람 (핑크)
     const B = mode === "couple" ? coupleView.b : mePayload;      // 응답한 사람 (퍼플)
-    const rep = coupleReport(A.t, B.t);
+    const rep = coupleReport(A.t, B.t, A.s, B.s);
     const grade = totalLabel(rep.total);
     const coupleLink = `${baseUrl()}#couple=${enc({ a: { n: A.n, t: A.t, s: A.s }, b: { n: B.n, t: B.t, s: B.s } })}`;
     const shareMsg = `💞 러브핏 궁합 결과\n\n${A.n}(${A.t}) ❤ ${B.n}(${B.t})\n궁합 ${rep.total}점 · ${grade.word}!\n\n전체 리포트 보기 👇\n${coupleLink}`;
@@ -949,8 +1295,9 @@ function LoveFit() {
           <div className="pop" style={{ borderRadius: 22, padding: "32px 26px", color: "#fff", marginBottom: 14, position: "relative", overflow: "hidden", background: "linear-gradient(135deg, #1C0F1E, #2A1533, #14162E)" }}>
             <div style={{ position: "absolute", right: -50, top: -60, width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(232,68,122,.45), transparent 65%)" }} />
             <div style={{ position: "absolute", left: -60, bottom: -70, width: 260, height: 260, borderRadius: "50%", background: "radial-gradient(circle, rgba(108,92,232,.5), transparent 65%)" }} />
+            <HeartRain n={12} />
             <div style={{ position: "relative", textAlign: "center" }}>
-              <div style={{ fontSize: 12.5, fontWeight: 800, color: C.gold, marginBottom: 12 }}>💞 우리의 궁합 리포트{rep.golden ? " · ✨ 이론상 천생연분 조합" : ""}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 800, color: C.gold, marginBottom: 12 }}>💞 우리의 궁합 리포트{rep.golden ? " · ✨ 이론상 천생연분 조합" : ""}{rep.bAxes && rep.bAxes.length ? ` · ⚖️ 경계선 축 ${rep.bAxes.length}개` : ""}</div>
               <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "clamp(10px, 4vw, 28px)", flexWrap: "wrap" }}>
                 <div style={{ textAlign: "center" }}>
                   <div style={{ fontSize: 62, lineHeight: 1 }}>{TYPES[A.t].emoji}</div>
@@ -959,9 +1306,11 @@ function LoveFit() {
                 </div>
                 <div style={{ textAlign: "center" }}>
                   <div className="beat" style={{ fontSize: 34, display: "inline-block" }}>❤️</div>
-                  <div style={{ fontSize: "clamp(46px, 9vw, 64px)", fontWeight: 900, lineHeight: 1, background: "linear-gradient(90deg, #FF8FB1, #CFC6FF)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>{rep.total}</div>
-                  <div style={{ fontSize: 14, fontWeight: 900, color: "#FFE0EC", marginTop: 2 }}>{grade.g}등급 · {grade.word}</div>
-                  <div style={{ fontSize: 11.5, color: "#B9A6B6", marginTop: 2 }}>{grade.desc}</div>
+                  <div style={{ fontSize: "clamp(46px, 9vw, 64px)", fontWeight: 900, lineHeight: 1, background: "linear-gradient(90deg, #FF8FB1, #CFC6FF)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+                    <CountUp to={rep.total} onDone={() => sfx("check")} />
+                  </div>
+                  <div className="reveal-late" style={{ fontSize: 14, fontWeight: 900, color: "#FFE0EC", marginTop: 2 }}>{grade.g}등급 · {grade.word}</div>
+                  <div className="reveal-late" style={{ fontSize: 11.5, color: "#B9A6B6", marginTop: 2 }}>{grade.desc}</div>
                 </div>
                 <div style={{ textAlign: "center" }}>
                   <div style={{ fontSize: 62, lineHeight: 1 }}>{TYPES[B.t].emoji}</div>
